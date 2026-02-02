@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
 
 struct InfoView: View {
     var onContinue: () -> Void = {}
@@ -25,7 +24,7 @@ struct InfoView: View {
 
                 // MARK: - Header (minimal)
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Co s tým?")
+                    Text("Kam s tým?")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(.black)
 
@@ -62,6 +61,10 @@ struct InfoView: View {
                 SwipeHint(
                     direction: .right
                 )
+                
+                
+            
+                
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.bottom, 10)
 
