@@ -154,3 +154,75 @@ private extension String {
         return t.isEmpty ? nil : t
     }
 }
+
+
+// MARK: - Stats
+
+struct KontejnerStats: Equatable {
+    let totalContainers: Int          // počet feature (kontejnerů)
+    let totalStations: Int            // počet unikátních stanoviste_ogc_fid
+    let byKind: [WasteKind: Int]      // počty podle druhu (počítáno po feature)
+}
+
+enum WasteKind: CaseIterable, Hashable {
+    case papir, plast, sklo, bioodpad, textil
+
+    var title: String {
+        switch self {
+        case .papir: return "Papír"
+        case .plast: return "Plast"
+        case .sklo: return "Sklo"
+        case .bioodpad: return "Bioodpad"
+        case .textil: return "Textil"
+        }
+    }
+}
+
+extension KontejneryService {
+
+    /// Počty kontejnerů podle komodit (počítáno po feature).
+    func fetchStats() async throws -> KontejnerStats {
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+            throw NSError(domain: "KontejneryService", code: http.statusCode)
+        }
+
+        let geo = try JSONDecoder().decode(GeoJSONFeatureCollection.self, from: data)
+
+        var byKind: [WasteKind: Int] = [:]
+        byKind.reserveCapacity(WasteKind.allCases.count)
+
+        var stations = Set<String>()
+        stations.reserveCapacity(2048)
+
+        for f in geo.features {
+            if let sid = f.properties.stanovisteOGCFID {
+                stations.insert(sid)
+            }
+
+            guard let kom = f.properties.komodita?.lowercased() else { continue }
+
+            if kom.contains("pap") { byKind[.papir, default: 0] += 1; continue }
+
+            // v datasetu bývá text typu "Plasty, nápojové kartony..."
+            if kom.contains("plast") || kom.contains("karton") || kom.contains("plech") {
+                byKind[.plast, default: 0] += 1
+                continue
+            }
+
+            // "Sklo barevné" / "Sklo bílé" -> jedno "Sklo"
+            if kom.contains("sklo") { byKind[.sklo, default: 0] += 1; continue }
+
+            if kom.contains("bio") { byKind[.bioodpad, default: 0] += 1; continue }
+
+            if kom.contains("textil") { byKind[.textil, default: 0] += 1; continue }
+        }
+
+        return KontejnerStats(
+            totalContainers: geo.features.count,
+            totalStations: stations.count,
+            byKind: byKind
+        )
+    }
+}

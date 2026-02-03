@@ -31,9 +31,6 @@ struct WelcomeView: View {
                         .foregroundStyle(.black)
                 }
                 
-                Text("Brno, kontejnerů plno.")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.black.opacity(0.65))
             }
             .padding(.horizontal, 24)
             VStack {

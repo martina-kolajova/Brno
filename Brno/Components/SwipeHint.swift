@@ -15,9 +15,11 @@ struct SwipeHint: View {
     }
 
     let direction: Direction
-    var count: Int = 3
-    var size: CGFloat = 28
-    var spacing: CGFloat = 12
+    var count: Int = 4
+    var height: CGFloat = 28
+    var minWidth: CGFloat = 2
+    var maxWidth: CGFloat = 8
+    var spacing: CGFloat = 16
     var travel: CGFloat = 16
     var duration: Double = 1.3
     var color: Color = .red
@@ -27,10 +29,10 @@ struct SwipeHint: View {
     var body: some View {
         Group {
             if direction == .right {
-                HStack(spacing: spacing) { arrows }
+                HStack(spacing: spacing) { bars }
                     .offset(x: offset)
             } else {
-                VStack(spacing: spacing) { arrows }
+                VStack(spacing: spacing) { bars }
                     .offset(y: offset)
             }
         }
@@ -41,12 +43,20 @@ struct SwipeHint: View {
         }
     }
 
-    private var arrows: some View {
+    private var bars: some View {
         ForEach(0..<count, id: \.self) { i in
-            Image(systemName: direction == .right ? "chevron.right" : "chevron.down")
-                .font(.system(size: size, weight: .bold))
-                .foregroundStyle(color)
-                .opacity(1.0 - Double(i) * 0.25)
+            Rectangle()
+                .fill(color)
+                .frame(
+                    width: barWidth(for: i),
+                    height: height
+                )
+                .opacity(1.0 - Double(i) * 0.15)
         }
+    }
+
+    private func barWidth(for index: Int) -> CGFloat {
+        let t = CGFloat(index) / CGFloat(max(count - 1, 1))
+        return minWidth + t * (maxWidth - minWidth)
     }
 }
