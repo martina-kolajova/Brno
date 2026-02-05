@@ -9,7 +9,11 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @State private var colorProgress: Double = 0
     @State private var dropped = false
+    var onFinished: () -> Void // <--- Přidáno
+    @State private var exitOffset: CGFloat = 0 // 1. Přidáme stav pro odjezd
+    
     
     var body: some View {
         ZStack {
@@ -17,11 +21,9 @@ struct WelcomeView: View {
             
             VStack(spacing: 12) {
                 HStack(spacing: 3) {
-                    
                     Text("Bordel")
                         .font(.system(size: 44, weight: .black))
                         .foregroundStyle(dropped ? .red : .black)
-                    // levá strana dolů (pravá "drží")
                         .rotationEffect(.degrees(dropped ? -12 : 0), anchor: .bottomTrailing)
                         .scaleEffect(dropped ? 0.97 : 1.0, anchor: .bottomTrailing)
                         .offset(y: dropped ? 2 : 0)
@@ -30,21 +32,35 @@ struct WelcomeView: View {
                         .font(.system(size: 44, weight: .black))
                         .foregroundStyle(.black)
                 }
+            }
+        }
+        .onAppear {
+            
+            // --- RYCHLOST ZABARVENÍ ---
+            // duration: 2.0 znamená, že se nápis barví 2 vteřiny
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
                 
-            }
-            .padding(.horizontal, 24)
-            VStack {
-                Spacer()
-                SwipeHint(direction: .right)
-                    .padding(.bottom, 36)
-            }
-            .onAppear {
-                // krátká pauza, ať to nepůsobí "trhavě" hned po otevření
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    withAnimation(.easeOut(duration: 0.35)) {
+                // 2. BARVENÍ: Teď se začne plynule barvit (trvá to 2 sekundy)
+                withAnimation(.easeInOut(duration: 2.0)) {
+                    colorProgress = 1.0
+                }
+                // FÁZE A: Pád nápisu
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.easeOut(duration: 0.4)) {
                         dropped = true
+                    }
+                    
+                    // FÁZE B: ODJEZD (Tady nastavuješ rychlost)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        // RYCHLOST ODJEZDU: duration upravuješ zde (např. 0.8 nebo 1.2)
+                        withAnimation(.easeInOut(duration: 3)) {
+                            exitOffset = -1000 // Odjede doleva
+                        }
                         
-                        
+                        // Přepnutí proběhne s malým zpožděním po začátku odjezdu
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                            onFinished()
+                        }
                     }
                 }
             }
@@ -52,6 +68,3 @@ struct WelcomeView: View {
     }
 }
 
-
-
-#Preview { WelcomeView() }
