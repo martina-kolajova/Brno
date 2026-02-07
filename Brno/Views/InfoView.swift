@@ -47,7 +47,10 @@ struct InfoView: View {
                         viewModel.selectedCategory = kind
                     }
                     .frame(height: 500)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(AnyTransition.asymmetric(
+                        insertion: .move(edge: .bottom).combined(with: .opacity),
+                        removal: .opacity
+                    ))
                 }
 
                 Spacer()
@@ -57,13 +60,19 @@ struct InfoView: View {
                     .frame(maxWidth: .infinity)
             }
         }
+        // V InfoView.swift najdi část se .sheet a uprav ji takto:
         .sheet(item: $viewModel.selectedCategory) { kind in
-            OdpadDetailView(kind: kind, count: stats?.byKind[kind] ?? 0, hint: viewModel.getHint(for: kind))
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+            OdpadDetailView(
+                kind: kind,
+                count: stats?.byKind[kind] ?? 0,
+                hint: viewModel.getHint(for: kind)
+            )
+            .presentationDetents([.large]) // Změna z .medium na .large pro celou obrazovku
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             viewModel.runFullSequence()
         }
     }
 }
+
