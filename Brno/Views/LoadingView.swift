@@ -7,30 +7,23 @@
 
 import SwiftUI
 
-struct LoadingView: View {
+
+
+struct LoadingView: View { // <--- Tohle : View tam musí být!
     @State private var rotation: Double = 0
 
     var body: some View {
-        VStack(spacing: 25) {
-            // Symbol recyklace (šipky v trojúhelníku)
+        VStack {
             Image(systemName: "arrow.3.trianglepath")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 70, height: 70)
-                .foregroundStyle(.red) // Ladíme k barvě "Bordel"
+                .frame(width: 50, height: 50)
+                .foregroundStyle(.red)
                 .rotationEffect(.degrees(rotation))
                 .onAppear {
-                    // Nekonečná lineární rotace (2 sekundy na jednu otočku)
                     withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
                         rotation = 360
                     }
                 }
-            
-            Text("Hledám kontejnery...")
-                .font(.system(size: 16, weight: .bold, design: .monospaced))
-                .foregroundStyle(.gray)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white)
     }
 }
