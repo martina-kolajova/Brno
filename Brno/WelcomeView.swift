@@ -21,7 +21,7 @@ struct WelcomeView: View {
             
             VStack(spacing: 12) {
                 HStack(spacing: 3) {
-                    Text("Bordel")
+                    Text("Wasted")
                         .font(.system(size: 44, weight: .black))
                         .foregroundStyle(dropped ? .red : .black)
                         .rotationEffect(.degrees(dropped ? -12 : 0), anchor: .bottomTrailing)
