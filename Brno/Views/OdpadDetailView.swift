@@ -88,34 +88,3 @@ struct OdpadDetailView: View {
         }
     }
 }
-//// MARK: - DETAILNÍ KARTA
-//struct OdpadDetailView: View {
-//    let kind: WasteKind
-//    let count: Int
-//    let hint: String
-//    @Environment(\.dismiss) var dismiss
-//
-//    var body: some View {
-//        VStack(spacing: 25) {
-//            Capsule().frame(width: 40, height: 6).foregroundStyle(.gray.opacity(0.3)).padding(.top, 15)
-//            Text(kind.titleShortUpper).font(.system(size: 38, weight: .black)).foregroundStyle(.red)
-//            
-//            VStack(spacing: 0) {
-//                Text("\(count)").font(.system(size: 70, weight: .black, design: .rounded))
-//                Text("KONTEJNERŮ V CELÉM BRNĚ").font(.caption.bold()).foregroundStyle(.secondary)
-//            }
-//
-//            VStack(alignment: .leading, spacing: 12) {
-//                Text("CO SEM PATŘÍ:").font(.system(size: 14, weight: .black))
-//                Text(hint).font(.system(size: 18, weight: .medium)).lineSpacing(5)
-//            }
-//            .frame(maxWidth: .infinity, alignment: .leading).padding(25)
-//            .background(Color.gray.opacity(0.1)).cornerRadius(20)
-//
-//            Spacer()
-//            Button("ZAVŘÍT") { dismiss() }.font(.headline).foregroundStyle(.gray).padding(.bottom, 20)
-//        }
-//        .padding(.horizontal)
-//    }
-//}
-//

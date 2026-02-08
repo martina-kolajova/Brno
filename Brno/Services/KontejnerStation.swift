@@ -27,7 +27,7 @@ final class KontejneryService: KontejneryServicing {
         "&outSR=4326" +
         "&f=geojson" +
         "&resultType=standard" +       // PŘIDÁNO: standardní typ výsledku
-        "&resultRecordCount=10000"     // PŘIDÁNO: limit 10 tisíc
+        "&resultRecordCount=1000"     // PŘIDÁNO: limit 10 tisíc
     )!) {
         self.url = url
     }

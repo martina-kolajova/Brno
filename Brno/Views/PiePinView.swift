@@ -3,35 +3,25 @@
 //  Brno
 //
 //  Created by Martina Kolajová on 07.02.2026.
-//
-
-
+//\
 import SwiftUI
 
+
+
 struct PiePinView: View {
-    // Použijeme ViewModel pro logiku pinu
-    @StateObject private var viewModel: PiePinViewModel
+    @ObservedObject var viewModel: PiePinViewModel
     let isSelected: Bool
-    
-    init(station: KontejnerStation, isSelected: Bool, activeFilters: Set<KomoditaFilter>) {
-        self.isSelected = isSelected
-        // Inicializace ViewModelu s daty ze stanice
-        _viewModel = StateObject(wrappedValue: PiePinViewModel(
-            station: station,
-            activeFilters: activeFilters
-        ))
-    }
-    
+
     var body: some View {
         ZStack {
-            // Základní kruh (pozadí pinu)
+            // Podkladový bílý kruh (stín a ohraničení)
             Circle()
                 .fill(.white)
                 .frame(width: isSelected ? 46 : 16, height: isSelected ? 46 : 16)
                 .shadow(color: .black.opacity(0.2), radius: isSelected ? 5 : 2)
-            
+
             if isSelected {
-                // Vykreslení barevných výsečí (donutu)
+                // ROZBALENÝ STAV (Koláčový graf)
                 let visibleItems = viewModel.visibleKomodity
                 ForEach(0..<visibleItems.count, id: \.self) { index in
                     PieSlice(
@@ -42,21 +32,20 @@ struct PiePinView: View {
                     .frame(width: 40, height: 40)
                 }
                 
-                // Vnitřní bílý kruh (vytváří efekt donutu)
+                // Bílý střed pro efekt "Donut" grafu
                 Circle()
                     .fill(.white)
                     .frame(width: 16, height: 16)
             } else {
-                // Malý jednoduchý puntík, když není pin rozkliknutý
+                // ZMENŠENÝ STAV (Malá tečka)
+                // OPRAVA: Index zde neexistuje, bereme barvu první komodity
                 Circle()
-                    .fill(viewModel.dominantColor)
+                    .fill(viewModel.colorFor(viewModel.visibleKomodity.first ?? ""))
                     .frame(width: 12, height: 12)
             }
         }
     }
 }
-
-// Tvar pro jednotlivé výseče
 struct PieSlice: Shape {
     var startAngle: Angle
     var endAngle: Angle

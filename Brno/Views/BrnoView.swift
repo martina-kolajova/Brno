@@ -1,150 +1,183 @@
-//
-//  BrnoView 2.swift
-//  Brno
-//
-//  Created by Martina Kolajová on 07.02.2026.
-
 import SwiftUI
 import MapKit
+import CoreLocation
 
+// MARK: - 1. Správce polohy
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    @Published var lastLocation: CLLocation?
 
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.requestWhenInUseAuthorization()
+        manager.startUpdatingLocation()
+    }
 
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        lastLocation = locations.last
+    }
+}
+
+// MARK: - 2. Hlavní View
 struct BrnoView: View {
     let allStations: [KontejnerStation]
+    @StateObject private var locationManager = LocationManager()
     @StateObject private var vm = BrnoMapViewModel()
     
-    @State private var selected: Set<KomoditaFilter> = Set(KomoditaFilter.allCases)
-    @State private var streetQuery: String = "" // Toto je text v horní liště
-    @State private var selectedStationID: String? = nil
-    @State private var selectedStation: KontejnerStation? = nil
+    @State private var streetQuery: String = "Náměstí Svobody"
+    @State private var destinationAddress: String = ""
+    @State private var showNavigationPanel = false
+    @State private var navDestination: KontejnerStation? = nil
     
-    @State private var camera = MapCameraPosition.region(
-        MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
-            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        )
-    )
-    
-    @State private var currentRegion: MKCoordinateRegion = MKCoordinateRegion(
+    @State private var camera: MapCameraPosition = .region(MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
-        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-    )
+        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    ))
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            // MAPA
+        ZStack(alignment: .top) {
             Map(position: $camera) {
-                if currentRegion.span.latitudeDelta < 0.03 {
-                    ForEach(filteredStations) { st in
-                        Annotation(st.title, coordinate: st.coordinate) {
-                            PiePinView(
-                                viewModel: PiePinViewModel(station: st, activeFilters: selected),
-                                isSelected: selectedStationID == st.id
-                            )
-                            .onTapGesture {
-                                selectStationFromMap(st)
-                            }
-                        }
+                ForEach(allStations) { st in
+                    Annotation(st.title, coordinate: st.coordinate) {
+                        PiePinView(viewModel: PiePinViewModel(station: st, activeFilters: Set(KomoditaFilter.allCases)), isSelected: navDestination?.id == st.id)
                     }
                 }
-                UserAnnotation()
-            }
-            .onMapCameraChange { context in
-                currentRegion = context.region
+                
+                if let userLoc = locationManager.lastLocation {
+                    Annotation("Já", coordinate: userLoc.coordinate) {
+                        UserLocationDot()
+                    }
+                }
             }
             .ignoresSafeArea()
 
-            // HORNÍ LIŠTA (Ovládací centrum)
-            VStack {
-                HStack {
-                    // Tady je tvoje pole pro ulici
-                    TextField("Zadejte ulici nebo vyberte z mapy...", text: $streetQuery)
-                        .padding(12)
-                        .background(.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 2)
-                    
-                    // PLUS TLAČÍTKO (Navigovat z adresy v liště)
-                    Button(action: startNavigationFromList) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundStyle(.red)
-                            .background(Circle().fill(.white))
+            VStack(spacing: 12) {
+                FiltersBar(selected: .constant(Set(KomoditaFilter.allCases)), streetQuery: $streetQuery) {
+                    withAnimation(.spring()) { showNavigationPanel.toggle() }
+                }
+                .padding(.top, 12)
+                
+                if showNavigationPanel {
+                    QuickNavButtons { filter in
+                        startNavigation(for: filter)
                     }
                 }
-                .padding(.horizontal)
-                .padding(.top, 10)
                 
-                // Rychlé filtry pod lištou
-                FiltersBar(selected: $selected, streetQuery: .constant("")) // Upraveno pro UI
                 Spacer()
-            }
-
-            // TLAČÍTKO GPS (Dole)
-            VStack {
-                Button(action: centerOnUserAndGetAddress) {
-                    Image(systemName: "location.fill")
-                        .font(.title2)
-                        .foregroundStyle(.red)
-                        .frame(width: 56, height: 56)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
+                
+                if !destinationAddress.isEmpty {
+                    DestinationBarDesign(address: destinationAddress) {
+                        withAnimation {
+                            destinationAddress = ""
+                            navDestination = nil
+                        }
+                    }
+                    .padding(.bottom, 30)
                 }
-                .padding(.trailing, 20)
-                .padding(.bottom, 40)
+            }
+
+            // ŠIPKA (GPS) - Teď už funkční
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: goToUserLocation) {
+                        Image(systemName: "location.fill")
+                            .font(.title2).foregroundStyle(.white)
+                            .frame(width: 56, height: 56).background(Color.red).clipShape(Circle()).shadow(radius: 4)
+                    }
+                    .padding(20)
+                    .padding(.bottom, destinationAddress.isEmpty ? 0 : 80)
+                }
             }
         }
     }
 
-    // 1. Akce: Kliknutí na stanoviště v mapě
-    private func selectStationFromMap(_ st: KontejnerStation) {
-        withAnimation {
-            selectedStationID = st.id
-            selectedStation = st
-            streetQuery = st.ulice // Vypíše ulici do horní lišty
-            camera = .region(MKCoordinateRegion(
-                center: st.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-            ))
-        }
-    }
-
-    // 2. Akce: GPS zaměření
-    private func centerOnUserAndGetAddress() {
-        withAnimation {
-            camera = .userLocation(fallback: .region(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            )))
-            // Zde by ideálně proběhl Reverse Geocoding pro zjištění ulice z GPS
-            streetQuery = "Moje poloha"
-        }
-    }
-
-    // 3. Akce: Stisk PLUS (Navigace k nejbližšímu podle textu v liště)
-    private func startNavigationFromList() {
-        // Pokud uživatel vybral konkrétní stanoviště, navigujeme tam
-        // Pokud jen napsal ulici, najdeme nejbližší stanoviště k centru mapy
-        if let nearest = vm.findNearest(to: currentRegion.center, in: filteredStations) {
+    private func goToUserLocation() {
+        if let userLoc = locationManager.lastLocation {
             withAnimation(.spring()) {
                 camera = .region(MKCoordinateRegion(
-                    center: nearest.coordinate,
+                    center: userLoc.coordinate,
                     span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
                 ))
-                selectedStationID = nearest.id
-                streetQuery = nearest.ulice
             }
         }
     }
 
-    private var filteredStations: [KontejnerStation] {
-        allStations.filter { st in
-            let matchStreet = streetQuery.isEmpty || streetQuery == "Moje poloha" || st.ulice.localizedCaseInsensitiveContains(streetQuery)
-            let hasVisibleKomodita = st.komodity.contains { komStr in
-                selected.contains { filter in komStr.localizedCaseInsensitiveContains(filter.rawValue) }
+    private func startNavigation(for filter: KomoditaFilter) {
+        let start = locationManager.lastLocation?.coordinate ?? CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068)
+        
+        if let nearest = vm.findNearest(to: start, for: filter, in: allStations) {
+            withAnimation(.spring()) {
+                self.navDestination = nearest
+                self.destinationAddress = nearest.ulice
+                self.showNavigationPanel = false
+                self.camera = .region(MKCoordinateRegion(center: nearest.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)))
             }
-            return matchStreet && hasVisibleKomodita
+        }
+    }
+}
+
+// MARK: - 3. Pomocné komponenty (vložit na konec souboru)
+
+struct UserLocationDot: View {
+    var body: some View {
+        ZStack {
+            Circle().fill(.red.opacity(0.2)).frame(width: 30, height: 30)
+            Circle().stroke(.white, lineWidth: 2).frame(width: 14, height: 14)
+            Circle().fill(.red).frame(width: 10, height: 10)
+        }
+    }
+}
+
+struct DestinationBarDesign: View {
+    let address: String
+    let onClose: () -> Void
+    var body: some View {
+        HStack {
+            Image(systemName: "flag.checkered").foregroundStyle(.red).padding(.leading, 8)
+            VStack(alignment: .leading) {
+                Text(address).font(.system(size: 16, weight: .bold))
+                Text("Cíl: Nejbližší stanoviště").font(.caption).foregroundStyle(.gray)
+            }
+            Spacer()
+            Button(action: onClose) { Image(systemName: "xmark.circle.fill").foregroundStyle(.gray.opacity(0.6)) }
+        }
+        .padding().background(Color.white).cornerRadius(20).shadow(radius: 5).padding(.horizontal, 16)
+    }
+}
+
+struct QuickNavButtons: View {
+    var onSelect: (KomoditaFilter) -> Void
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(KomoditaFilter.allCases) { filter in
+                    Button { onSelect(filter) } label: {
+                        VStack {
+                            Image(systemName: filter.iconName).font(.title2)
+                            Text(filter.rawValue.prefix(10) + "...").font(.caption2).fontWeight(.bold)
+                        }
+                        .foregroundStyle(.white).frame(width: 75, height: 75)
+                        .background(filter.color).clipShape(RoundedRectangle(cornerRadius: 15))
+                    }
+                }
+            }
+            .padding(.horizontal, 16).padding(.vertical, 8)
+        }.background(Color.white.opacity(0.9)).cornerRadius(20).padding(.horizontal, 16)
+    }
+}
+
+// MARK: - 4. Rozšíření tvého existujícího filtru o ikony
+extension KomoditaFilter {
+    var iconName: String {
+        switch self {
+        case .papir: return "doc.text"
+        case .plast: return "bottles.rack"
+        case .bio: return "leaf"
+        case .skloBarevne, .skloBile: return "wineglass"
+        case .textil: return "tshirt"
         }
     }
 }

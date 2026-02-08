@@ -1,28 +1,25 @@
+//
+//  BrnoMapViewModel.swift
+//  Brno
+//
+//  Created by Martina Kolajová on 07.02.2026.
+//
+
 import SwiftUI
 import MapKit
 
 class BrnoMapViewModel: ObservableObject {
-    @Published var allStations: [KontejnerStation] = []
-    @Published var selectedStationID: String? = nil
-    @Published var selectedFilters: Set<KomoditaFilter> = Set(KomoditaFilter.allCases)
-    @Published var streetQuery: String = ""
-    
-    // Funkce pro nalezení nejbližšího kontejneru
-    func findNearest(to location: CLLocationCoordinate2D) {
-        // Tady budeš počítat vzdálenost a posouvat kameru
-        // Použij CLLocation(latitude:longitude:).distance(from:)
-    }
-    
-    // Logika pro filtrování stanic (volá se v BrnoView)
-    func filteredStations() -> [KontejnerStation] {
-        allStations.filter { st in
-            let matchStreet = streetQuery.isEmpty || st.ulice.localizedCaseInsensitiveContains(streetQuery)
-            let hasVisibleKomodita = st.komodity.contains { komStr in
-                selectedFilters.contains { filter in 
-                    komStr.localizedCaseInsensitiveContains(filter.rawValue) 
-                }
-            }
-            return matchStreet && hasVisibleKomodita
+    func findNearest(to location: CLLocationCoordinate2D, for filter: KomoditaFilter, in stations: [KontejnerStation]) -> KontejnerStation? {
+        let userPos = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        
+        let validStations = stations.filter { st in
+            st.komodity.contains { $0.localizedCaseInsensitiveContains(filter.rawValue) }
         }
+        
+        return validStations.min(by: {
+            let d1 = CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude).distance(from: userPos)
+            let d2 = CLLocation(latitude: $1.coordinate.latitude, longitude: $1.coordinate.longitude).distance(from: userPos)
+            return d1 < d2
+        })
     }
 }
