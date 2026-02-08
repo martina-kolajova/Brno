@@ -1,145 +1,150 @@
 //
-//  KontejneryMapScreen.swift
+//  BrnoView 2.swift
 //  Brno
 //
-//  Created by Martina Kolajová on 01.02.2026.
-//
+//  Created by Martina Kolajová on 07.02.2026.
 
 import SwiftUI
 import MapKit
 
 
+
 struct BrnoView: View {
     let allStations: [KontejnerStation]
+    @StateObject private var vm = BrnoMapViewModel()
     
-    @State private var selectedStationID: String? = nil
     @State private var selected: Set<KomoditaFilter> = Set(KomoditaFilter.allCases)
-    @State private var streetQuery: String = ""
+    @State private var streetQuery: String = "" // Toto je text v horní liště
+    @State private var selectedStationID: String? = nil
+    @State private var selectedStation: KontejnerStation? = nil
     
     @State private var camera = MapCameraPosition.region(
         MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
-            span: MKCoordinateSpan(latitudeDelta: 0.04, longitudeDelta: 0.04)
+            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
         )
+    )
+    
+    @State private var currentRegion: MKCoordinateRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
+        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     )
 
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .bottomTrailing) {
+            // MAPA
             Map(position: $camera) {
-                ForEach(filteredStations) { st in
-                    Annotation(st.title, coordinate: st.coordinate) {
-                        // Předáváme i informaci o aktivních filtrech pro správné vykreslení výsečí
-                        PiePinView(
-                            station: st,
-                            isSelected: selectedStationID == st.id,
-                            activeFilters: selected
-                        )
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.65)) {
-                                selectedStationID = (selectedStationID == st.id) ? nil : st.id
+                if currentRegion.span.latitudeDelta < 0.03 {
+                    ForEach(filteredStations) { st in
+                        Annotation(st.title, coordinate: st.coordinate) {
+                            PiePinView(
+                                viewModel: PiePinViewModel(station: st, activeFilters: selected),
+                                isSelected: selectedStationID == st.id
+                            )
+                            .onTapGesture {
+                                selectStationFromMap(st)
                             }
                         }
                     }
                 }
+                UserAnnotation()
+            }
+            .onMapCameraChange { context in
+                currentRegion = context.region
             }
             .ignoresSafeArea()
 
-            FiltersBar(selected: $selected, streetQuery: $streetQuery)
-                .padding(.top, 12)
+            // HORNÍ LIŠTA (Ovládací centrum)
+            VStack {
+                HStack {
+                    // Tady je tvoje pole pro ulici
+                    TextField("Zadejte ulici nebo vyberte z mapy...", text: $streetQuery)
+                        .padding(12)
+                        .background(.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 2)
+                    
+                    // PLUS TLAČÍTKO (Navigovat z adresy v liště)
+                    Button(action: startNavigationFromList) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.red)
+                            .background(Circle().fill(.white))
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 10)
+                
+                // Rychlé filtry pod lištou
+                FiltersBar(selected: $selected, streetQuery: .constant("")) // Upraveno pro UI
+                Spacer()
+            }
+
+            // TLAČÍTKO GPS (Dole)
+            VStack {
+                Button(action: centerOnUserAndGetAddress) {
+                    Image(systemName: "location.fill")
+                        .font(.title2)
+                        .foregroundStyle(.red)
+                        .frame(width: 56, height: 56)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 4)
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 40)
+            }
         }
     }
 
-    // --- OPRAVENÁ FILTRACE ---
+    // 1. Akce: Kliknutí na stanoviště v mapě
+    private func selectStationFromMap(_ st: KontejnerStation) {
+        withAnimation {
+            selectedStationID = st.id
+            selectedStation = st
+            streetQuery = st.ulice // Vypíše ulici do horní lišty
+            camera = .region(MKCoordinateRegion(
+                center: st.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+            ))
+        }
+    }
+
+    // 2. Akce: GPS zaměření
+    private func centerOnUserAndGetAddress() {
+        withAnimation {
+            camera = .userLocation(fallback: .region(MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )))
+            // Zde by ideálně proběhl Reverse Geocoding pro zjištění ulice z GPS
+            streetQuery = "Moje poloha"
+        }
+    }
+
+    // 3. Akce: Stisk PLUS (Navigace k nejbližšímu podle textu v liště)
+    private func startNavigationFromList() {
+        // Pokud uživatel vybral konkrétní stanoviště, navigujeme tam
+        // Pokud jen napsal ulici, najdeme nejbližší stanoviště k centru mapy
+        if let nearest = vm.findNearest(to: currentRegion.center, in: filteredStations) {
+            withAnimation(.spring()) {
+                camera = .region(MKCoordinateRegion(
+                    center: nearest.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                ))
+                selectedStationID = nearest.id
+                streetQuery = nearest.ulice
+            }
+        }
+    }
+
     private var filteredStations: [KontejnerStation] {
         allStations.filter { st in
-            // 1. Filtr ulice (ponecháme)
-            let matchStreet = streetQuery.isEmpty || st.ulice.localizedCaseInsensitiveContains(streetQuery)
-            
-            // 2. OPRAVENÝ FILTR KOMODIT
-            // Projdeme všechny komodity na daném stanovišti
+            let matchStreet = streetQuery.isEmpty || streetQuery == "Moje poloha" || st.ulice.localizedCaseInsensitiveContains(streetQuery)
             let hasVisibleKomodita = st.komodity.contains { komStr in
-                // Stanoviště je viditelné, pokud se text komodity shoduje s některým AKTIVNÍM filtrem
-                selected.contains { filter in
-                    // Použijeme localizedCaseInsensitiveContains pro maximální shodu
-                    // Předpokládám, že filter.rawValue obsahuje klíčová slova jako "plast", "pap", "sklo"
-                    komStr.localizedCaseInsensitiveContains(filter.rawValue)
-                }
+                selected.contains { filter in komStr.localizedCaseInsensitiveContains(filter.rawValue) }
             }
-            
             return matchStreet && hasVisibleKomodita
         }
-    }
-}
-
-// MARK: - Opravený PiePinView
-struct PiePinView: View {
-    let station: KontejnerStation
-    let isSelected: Bool
-    let activeFilters: Set<KomoditaFilter>
-    
-    // Získáme pouze ty komodity, které uživatel nezablokoval filtrem
-    private var visibleKomodity: [String] {
-        station.komodity.filter { komStr in
-            activeFilters.contains { filter in
-                komStr.localizedCaseInsensitiveContains(filter.rawValue)
-            }
-        }
-    }
-    
-    var body: some View {
-        ZStack {
-            // Pozadí pinu
-            Circle()
-                .fill(.white)
-                .frame(width: isSelected ? 46 : 16, height: isSelected ? 46 : 16)
-                .shadow(color: .black.opacity(0.2), radius: isSelected ? 5 : 2)
-            
-            if isSelected {
-                // Vykreslíme výseče POUZE pro aktivní (filtrované) komodity
-                let items = visibleKomodity
-                ForEach(0..<items.count, id: \.self) { index in
-                    PieSlice(
-                        startAngle: .degrees(Double(index) / Double(items.count) * 360.0 - 90.0),
-                        endAngle: .degrees(Double(index + 1) / Double(items.count) * 360.0 - 90.0)
-                    )
-                    .fill(colorFor(items[index]))
-                    .frame(width: 40, height: 40)
-                }
-                
-                // Donut efekt
-                Circle()
-                    .fill(.white)
-                    .frame(width: 16, height: 16)
-            } else {
-                // Malá tečka - barva podle první viditelné komodity
-                Circle()
-                    .fill(colorFor(visibleKomodity.first ?? ""))
-                    .frame(width: 12, height: 12)
-            }
-        }
-    }
-    
-    private func colorFor(_ string: String) -> Color {
-        let s = string.lowercased()
-        if s.contains("plast") || s.contains("kov") { return .yellow }
-        if s.contains("pap") { return .blue }
-        if s.contains("sklo") { return .green }
-        if s.contains("textil") { return .orange }
-        if s.contains("bio") { return .brown }
-        return .gray
-    }
-}
-
-struct PieSlice: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        path.move(to: center)
-        path.addArc(center: center, radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
-        path.closeSubpath()
-        return path
     }
 }
