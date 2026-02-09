@@ -40,7 +40,7 @@ class PiePinViewModel: ObservableObject {
         if s.contains("plast") || s.contains("kov") { return .yellow }
         if s.contains("pap") { return .blue }
         if s.contains("sklo") { return .green }
-        if s.contains("textil") { return .orange }
+        if s.contains("textil") { return .purple }
         if s.contains("bio") { return .brown }
         return .red
     }
