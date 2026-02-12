@@ -9,40 +9,76 @@
 import Foundation
 import SwiftUI
 
+
 enum WasteKind: String, CaseIterable, Hashable, Identifiable {
-    case papir = "papir"
-    case plast = "plast"
-    case sklo = "sklo"
-    case bioodpad = "bioodpad"
-    case textil = "textil"
+    case papir, plast, sklo, bioodpad, textil
     
     var id: String { self.rawValue }
+}
 
-    var title: String {
-        switch self {
-        case .papir: return "Papír"
-        case .plast: return "Plast"
-        case .sklo: return "Sklo"
-        case .bioodpad: return "Bioodpad"
-        case .textil: return "Textil"
+extension WasteKind {
+    // Definujeme strukturu přesně podle tvého JSONu
+    private struct WasteDataEntry: Codable {
+        let id: String
+        let title: String
+        let titleShortUpper: String
+        let colorHex: String
+        let hint: String
+        let warning: String
+        let education: String
+    }
+
+    // Pomocná funkce pro načtení konkrétního řádku z JSONu
+    private var jsonData: WasteDataEntry? {
+        guard let url = Bundle.main.url(forResource: "WasteData", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let entries = try? JSONDecoder().decode([WasteDataEntry].self, from: data) else {
+            return nil
         }
+        return entries.first(where: { $0.id == self.rawValue })
+    }
+
+    // Všechny vlastnosti teď taháme z JSONu
+    var title: String {
+        jsonData?.title ?? self.rawValue.capitalized
     }
     
     var titleShortUpper: String {
-        self.title.uppercased()
+        jsonData?.titleShortUpper ?? self.rawValue.uppercased()
     }
     
     var hint: String {
-        switch self {
-        case .plast: return "PET lahve, kelímky, fólie, krabice od mléka, polystyren."
-        case .papir: return "Časopisy, noviny, krabice, letáky, obálky s fólií."
-        case .sklo: return "Nevratné lahve, sklenice od zavařenin, tabulové sklo."
-        case .bioodpad: return "Zbytky ovoce a zeleniny, kávová sedlina, tráva, listí."
-        case .textil: return "Čisté oblečení, obuv, bytový textil v sáčcích."
+        jsonData?.hint ?? "Informace o tom, co sem patří, chybí."
+    }
+
+    var warning: String {
+        jsonData?.warning ?? "Informace o nevhodném odpadu nejsou dostupné."
+    }
+
+    var education: String {
+        jsonData?.education ?? "Recyklace šetří naše životní prostředí."
+    }
+
+    var color: Color {
+        if let hex = jsonData?.colorHex {
+            return Color(hex: hex)
         }
+        return .gray
     }
 }
 
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let r, g, b: UInt64
+        r = (int >> 16) & 0xFF
+        g = (int >> 8) & 0xFF
+        b = int & 0xFF
+        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: 1)
+    }
+}
 struct KontejnerStats: Equatable {
     let totalContainers: Int
     let totalStations: Int

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2A1ECC9A2F398A3200A12850 /* Brno.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 2A1ECC992F398A0A00A12850 /* Brno.gpx */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2AA3FAFB2F29A47B00194DE9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,14 +28,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A1ECC992F398A0A00A12850 /* Brno.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brno.gpx; sourceTree = "<group>"; };
 		2AA3FAED2F29A47A00194DE9 /* Brno.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Brno.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FAFA2F29A47B00194DE9 /* BrnoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrnoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FB042F29A47B00194DE9 /* BrnoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrnoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Brno" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2AA3FAEC2F29A47A00194DE9 /* Brno */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2AA3FAEF2F29A47A00194DE9 /* Brno */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Brno" target */,
+			);
 			path = Brno;
 			sourceTree = "<group>";
 		};
@@ -75,6 +93,7 @@
 		2AA3FAE42F29A47A00194DE9 = {
 			isa = PBXGroup;
 			children = (
+				2A1ECC992F398A0A00A12850 /* Brno.gpx */,
 				2AA3FAEF2F29A47A00194DE9 /* Brno */,
 				2AA3FAFD2F29A47B00194DE9 /* BrnoTests */,
 				2AA3FB072F29A47B00194DE9 /* BrnoUITests */,
@@ -212,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A1ECC9A2F398A3200A12850 /* Brno.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +420,10 @@
 				DEVELOPMENT_TEAM = J42JFKHY6Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Brno/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aplikace potřebuje vaši polohu pro zobrazení mapy odpadových kontejnerů v Brně";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +452,10 @@
 				DEVELOPMENT_TEAM = J42JFKHY6Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Brno/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Aplikace potřebuje vaši polohu pro zobrazení mapy odpadových kontejnerů v Brně";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

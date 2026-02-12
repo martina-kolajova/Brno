@@ -60,12 +60,11 @@ struct InfoView: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        // V InfoView.swift najdi část se .sheet a uprav ji takto:
+        // V InfoView.swift najdi tuto část:
         .sheet(item: $viewModel.selectedCategory) { kind in
             OdpadDetailView(
                 kind: kind,
-                count: stats?.byKind[kind] ?? 0,
-                hint: viewModel.getHint(for: kind)
+                count: stats?.byKind[kind] ?? 0
             )
             .presentationDetents([.large]) // Změna z .medium na .large pro celou obrazovku
             .presentationDragIndicator(.visible)
