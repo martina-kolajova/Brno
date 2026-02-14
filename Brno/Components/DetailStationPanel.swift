@@ -9,25 +9,14 @@ import SwiftUI
 import CoreLocation
 
 
+
 struct DetailStationPanel: View {
     let station: KontejnerStation
-    let userLocation: CLLocationCoordinate2D?
+    // Přidáme novou proměnnou pro text z navigace
+    let navInfo: String?
+    
     var onNavigate: () -> Void
     var onClose: () -> Void
-    
-    // Pomocná funkce pro výpočet vzdálenosti v metrech/kilometrech
-    var distanceString: String {
-        guard let userLocation else { return "-- m" }
-        let start = CLLocation(latitude: userLocation.latitude, longitude: userLocation.longitude)
-        let end = CLLocation(latitude: station.coordinate.latitude, longitude: station.coordinate.longitude)
-        let distance = start.distance(from: end)
-        
-        if distance < 1000 {
-            return "\(Int(distance)) m"
-        } else {
-            return String(format: "%.1f km", distance / 1000)
-        }
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -42,18 +31,20 @@ struct DetailStationPanel: View {
                 
                 Spacer()
                 
-                // VZDÁLENOST A BOTIČKY
-                HStack(spacing: 4) {
-                    Image(systemName: "figure.walk") // Ikona botiček/chůze
-                        .font(.subheadline)
-                    Text(distanceString)
-                        .font(.system(size: 14, weight: .bold))
+                // Tady se zobrazí informace z navigace (např. 1.5 km • 18 min)
+                if let info = navInfo, !info.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "figure.walk")
+                        Text(info)
+                            .font(.system(size: 14, weight: .bold))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.red.opacity(0.1)) // Jemně červená, aby to ladilo
+                    
+                    .foregroundStyle(.red)
+                    .cornerRadius(10)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(10)
-                .padding(.trailing, 8)
 
                 Button(action: onClose) {
                     Image(systemName: "xmark.circle.fill")
@@ -64,7 +55,6 @@ struct DetailStationPanel: View {
             
             Divider()
             
-            // Ikony kontejnerů
             HStack(spacing: 12) {
                 ForEach(station.komodity, id: \.self) { kom in
                     if let filter = KomoditaFilter.allCases.first(where: { kom.contains($0.rawValue) || $0.rawValue.contains(kom) }) {
@@ -78,7 +68,6 @@ struct DetailStationPanel: View {
                 }
             }
             
-            // ČERVENÉ TLAČÍTKO
             Button(action: onNavigate) {
                 HStack {
                     Image(systemName: "arrow.triangle.turn.up.right.fill")

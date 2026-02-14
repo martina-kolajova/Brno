@@ -1,12 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "clock.png",
+      "filename" : "icons8-funnel-50.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "icons8-funnel-50.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

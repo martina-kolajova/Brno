@@ -17,24 +17,37 @@ class PiePinViewModel: ObservableObject {
         self.activeFilters = activeFilters
     }
     
-    var visibleKomodity: [String] {
-        station.komodity.filter { komStr in
+    // 1. Tady určíme, co se v koláči vůbec objeví
+    var displayedKomodity: [String] {
+        // Pokud není filtr, ukaž vše
+        if activeFilters.isEmpty {
+            return station.komodity
+        }
+        
+        // Filtrujeme: v poli zůstanou jen ty, co uživatel CHCE vidět
+        return station.komodity.filter { komStr in
             activeFilters.contains { filter in
                 komStr.localizedCaseInsensitiveContains(filter.rawValue)
             }
         }
     }
     
-    var dominantColor: Color {
-        colorFor(visibleKomodity.first ?? "")
-    }
-    
+    // 2. Úhel počítáme dynamicky podle počtu AKTUÁLNĚ viditelných prvků
     func angle(for index: Int) -> Angle {
-        let total = visibleKomodity.count
+        let total = displayedKomodity.count
         guard total > 0 else { return .degrees(0) }
+        
+        // Rozdělí 360 stupňů rovnoměrně mezi viditelné kusy
         return .degrees(Double(index) / Double(total) * 360.0 - 90.0)
     }
     
+    // Pomocná funkce pro koncový úhel (aby na sebe dílky navazovaly)
+    func endAngle(for index: Int) -> Angle {
+        let total = displayedKomodity.count
+        guard total > 0 else { return .degrees(0) }
+        return .degrees(Double(index + 1) / Double(total) * 360.0 - 90.0)
+    }
+
     func colorFor(_ kind: String) -> Color {
         let s = kind.lowercased()
         if s.contains("plast") || s.contains("kov") { return .yellow }

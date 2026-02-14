@@ -8,154 +8,92 @@
 
 import SwiftUI
 import SwiftUI
-
 struct FiltersBar: View {
     @Binding var selected: Set<KomoditaFilter>
     @Binding var streetQuery: String
-    var onQuickNavTap: () -> Void // Akce pro červenou šipku
+    // Přidáme tento stav pro schovávání/ukazování:
+    @State private var showFilters: Bool = false
 
     var body: some View {
         VStack(spacing: 12) {
-            // 1. ŘÁDEK: Hledání a Rychlá navigace
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.gray)
-                
-                TextField("Hledat ulici v Brně...", text: $streetQuery)
-                    .textInputAutocapitalization(.words)
-                
-                if !streetQuery.isEmpty {
-                    Button { streetQuery = "" } label: {
-                        Image(systemName: "xmark.circle.fill").foregroundStyle(.gray)
+            HStack(spacing: 12) {
+                // TLAČÍTKO FILTR (přepíná zobrazení barevných kroužků)
+                Button(action: {
+                    withAnimation(.spring()) {
+                        showFilters.toggle()
                     }
+                }) {
+                    Image(showFilters ? "funnel_fill" : "funnel") // Bez 'systemName', jen název tvého souboru
+                        .resizable() // Důležité u vlastních obrázků!
+                        .aspectRatio(contentMode: .fit)
+                        .padding(12) // Aby trychtýř nebyl nalepený na okrajích kruhu
+                        .frame(width: 45, height: 45)
+                        .foregroundStyle(.red) // Bude fungovat, jen pokud je obrázek typu "Template Image" v Assets
+                        .background(
+                            Circle()
+                                .fill(.white)
+                                .shadow(color: .black.opacity(0.15), radius: 4)
+                        )
                 }
-                
-                Divider().frame(height: 20)
-                
-                // Červená šipka - Teď vypadá jako "Start"
-                Button(action: onQuickNavTap) {
-                    Image(systemName: "arrow.triangle.turn.up.right.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundStyle(.red)
-                }
-            }
-            .padding(.horizontal, 12).padding(.vertical, 8)
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
 
-            // 2. ŘÁDEK: Filtry (kompaktní a elegantní)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(KomoditaFilter.allCases, id: \.self) { f in
-                        Button { toggle(f) } label: {
-                            VStack(spacing: 4) {
-                                Image(systemName: f.iconName)
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundStyle(selected.contains(f) ? .white : f.color)
-                                    .frame(width: 36, height: 36)
-                                    .background(selected.contains(f) ? f.color : f.color.opacity(0.12))
-                                    .clipShape(Circle())
-                                
-                                Text(f.displayName)
-                                    .font(.system(size: 10, weight: .medium))
-                                    .foregroundStyle(selected.contains(f) ? .primary : .secondary)
+                // VYHLEDÁVÁNÍ ULICE
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.gray)
+                    TextField("Hledat ulici v Brně...", text: $streetQuery)
+                }
+                .padding(.horizontal)
+                .frame(height: 44)
+                .background(RoundedRectangle(cornerRadius: 22).fill(.white).shadow(radius: 2))
+            }
+            .padding(.horizontal)
+
+            // BAREVNÉ FILTRY (Ukážou se jen po kliku na ikonu filtru)
+            if showFilters {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(KomoditaFilter.allCases) { filter in
+                            FilterTag(filter: filter, isSelected: selected.contains(filter)) {
+                                if selected.contains(filter) {
+                                    selected.remove(filter)
+                                } else {
+                                    selected.insert(filter)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal, 4)
-            }
-        }
-        .padding(12)
-        .background(.ultraThinMaterial) // Efekt skla jako v iOS
-        .cornerRadius(20)
-        .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
-        .padding(.horizontal, 16)
-    }
-
-    private func toggle(_ f: KomoditaFilter) {
-        withAnimation(.spring(response: 0.3)) {
-            if selected.contains(f) {
-                if selected.count > 1 { selected.remove(f) }
-            } else {
-                selected.insert(f)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
     }
 }
-
-//struct FiltersBar: View {
-//    @Binding var selected: Set<KomoditaFilter>
-//    @Binding var streetQuery: String
-//    var onQuickNavTap: () -> Void // Akce pro červenou šipku
-//
-//    var body: some View {
-//        VStack(spacing: 12) {
-//            // HLAVNÍ ŘÁDEK HLEDÁNÍ
-//            HStack(spacing: 10) {
-//                Image(systemName: "magnifyingglass")
-//                    .foregroundStyle(.gray)
-//                
-//                TextField("Zadejte ulici v Brně...", text: $streetQuery)
-//                    .textInputAutocapitalization(.words)
-//                
-//                if !streetQuery.isEmpty {
-//                    Button { streetQuery = "" } label: {
-//                        Image(systemName: "xmark.circle.fill").foregroundStyle(.gray)
-//                    }
-//                }
-//                
-//                Divider().frame(height: 20)
-//                
-//                // Červená šipka (Rychlá navigace)
-//                Button(action: onQuickNavTap) {
-//                    Image(systemName: "arrow.triangle.turn.up.right.circle.fill")
-//                        .font(.system(size: 28))
-//                        .foregroundStyle(.red)
-//                }
-//            }
-//            .padding(.horizontal, 12).padding(.vertical, 8)
-//            .background(Color(.systemBackground))
-//            .cornerRadius(12)
-//            
-//            // FILTRY (Kulaté, malé, přímo v kartě)
-//            ScrollView(.horizontal, showsIndicators: false) {
-//                HStack(spacing: 15) {
-//                    ForEach(KomoditaFilter.allCases, id: \.self) { f in
-//                        Button { toggle(f) } label: {
-//                            VStack(spacing: 4) {
-//                                Image(systemName: f.iconName)
-//                                    .font(.system(size: 16, weight: .bold))
-//                                    .foregroundStyle(selected.contains(f) ? .white : f.color)
-//                                    .frame(width: 38, height: 38)
-//                                    .background(selected.contains(f) ? f.color : f.color.opacity(0.1))
-//                                    .clipShape(Circle())
-//                                
-//                                Text(f.displayName)
-//                                    .font(.system(size: 10, weight: .medium))
-//                                    .foregroundStyle(selected.contains(f) ? .primary : .secondary)
-//                            }
-//                        }
-//                    }
-//                }
-//                .padding(.horizontal, 5)
-//            }
-//        }
-//        .padding(12)
-//        .background(.ultraThinMaterial)
-//        .cornerRadius(20)
-//        .shadow(color: .black.opacity(0.15), radius: 10, y: 5)
-//        .padding(.horizontal, 16)
-//    }
-//
-//    private func toggle(_ f: KomoditaFilter) {
-//        withAnimation(.spring(response: 0.3)) {
-//            if selected.contains(f) {
-//                if selected.count > 1 { selected.remove(f) }
-//            } else {
-//                selected.insert(f)
-//            }
-//        }
-//    }
-//}
-
+struct FilterTag: View {
+    let filter: KomoditaFilter
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                // Ikona komodity
+                Image(systemName: filter.iconName)
+                    .font(.system(size: 14, weight: .bold))
+                
+                // Název komodity (volitelné, pokud chceš jen ikony, smaž Text)
+                Text(filter.displayName)
+                    .font(.system(size: 9, weight: .medium))
+            }
+            .foregroundStyle(isSelected ? .white : filter.color)
+            .frame(width: 55, height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? filter.color : filter.color.opacity(0.15))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(filter.color.opacity(0.3), lineWidth: isSelected ? 0 : 1)
+            )
+        }
+    }
+}

@@ -14,36 +14,34 @@ struct PiePinView: View {
 
     var body: some View {
         ZStack {
-            // Podkladový bílý kruh (stín a ohraničení)
+            // 1. Podkladový bílý kruh (stín a ohraničení)
             Circle()
                 .fill(.white)
-                .frame(width: isSelected ? 46 : 16, height: isSelected ? 46 : 16)
+                // Pokud je vybraný, je větší, pokud ne, je to standardní malý koláček
+                .frame(width: isSelected ? 48 : 34)
                 .shadow(color: .black.opacity(0.2), radius: isSelected ? 5 : 2)
 
-            if isSelected {
-                // ROZBALENÝ STAV (Koláčový graf)
-                let visibleItems = viewModel.visibleKomodity
-                ForEach(0..<visibleItems.count, id: \.self) { index in
-                    PieSlice(
-                        startAngle: viewModel.angle(for: index),
-                        endAngle: viewModel.angle(for: index + 1)
-                    )
-                    .fill(viewModel.colorFor(visibleItems[index]))
-                    .frame(width: 40, height: 40)
-                }
-                
-                // Bílý střed pro efekt "Donut" grafu
-                Circle()
-                    .fill(.white)
-                    .frame(width: 16, height: 16)
-            } else {
-                // ZMENŠENÝ STAV (Malá tečka)
-                // OPRAVA: Index zde neexistuje, bereme barvu první komodity
-                Circle()
-                    .fill(viewModel.colorFor(viewModel.visibleKomodity.first ?? ""))
-                    .frame(width: 12, height: 12)
+            // 2. KOLÁČOVÝ GRAF - Teď je vidět VŽDY
+            let visibleItems = viewModel.displayedKomodity
+
+            ForEach(0..<visibleItems.count, id: \.self) { index in
+                PieSlice(
+                    startAngle: viewModel.angle(for: index),
+                    endAngle: viewModel.endAngle(for: index) // Použijeme novou funkci
+                )
+                .fill(viewModel.colorFor(visibleItems[index]))
+                .frame(width: isSelected ? 42 : 28, height: isSelected ? 42 : 28)
             }
+            
+            
+            // 3. Bílý střed pro efekt "Donut" grafu
+            Circle()
+                .fill(.white)
+                .frame(width: isSelected ? 18 : 12)
         }
+        // Jemná animace při rozbalení
+        .scaleEffect(isSelected ? 1.2 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
     }
 }
 struct PieSlice: Shape {
