@@ -7,7 +7,9 @@
 
 
 import SwiftUI
-import SwiftUI
+
+
+
 struct FiltersBar: View {
     @Binding var selected: Set<KomoditaFilter>
     @Binding var streetQuery: String
@@ -23,23 +25,23 @@ struct FiltersBar: View {
                         showFilters.toggle()
                     }
                 }) {
-                    Image(showFilters ? "funnel_fill" : "funnel") // Bez 'systemName', jen název tvého souboru
-                        .resizable() // Důležité u vlastních obrázků!
-                        .aspectRatio(contentMode: .fit)
-                        .padding(12) // Aby trychtýř nebyl nalepený na okrajích kruhu
+                    Image(systemName: showFilters ? "line.horizontal.3.decrease.circle.fill"
+                                                  : "line.horizontal.3.decrease.circle")
+                        .font(.system(size: 18, weight: .semibold))
                         .frame(width: 45, height: 45)
-                        .foregroundStyle(.red) // Bude fungovat, jen pokud je obrázek typu "Template Image" v Assets
+                        .foregroundStyle(.red)
                         .background(
                             Circle()
                                 .fill(.white)
                                 .shadow(color: .black.opacity(0.15), radius: 4)
                         )
+
                 }
 
                 // VYHLEDÁVÁNÍ ULICE
                 HStack(spacing: 10) {
                     Image(systemName: "magnifyingglass").foregroundStyle(.gray)
-                    TextField("Hledat ulici v Brně...", text: $streetQuery)
+                    TextField("Hledat ulicu v Štatlu...", text: $streetQuery)
                 }
                 .padding(.horizontal)
                 .frame(height: 44)

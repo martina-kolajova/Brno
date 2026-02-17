@@ -154,20 +154,11 @@ struct BrnoView: View {
                 }
                 Spacer()
             }
-
-            // 3. VRSTVA: DETAIL STANICE
+//
+//    // Detail stanice
             if let station = selectedStation {
                 VStack(spacing: 0) {
-                    if !routeDistance.isEmpty {
-                        HStack {
-                            Image(systemName: "figure.walk")
-                            Text("\(routeDistance) • \(routeTravelTime)").fontWeight(.bold)
-                        }
-                        .padding(.vertical, 8).padding(.horizontal, 16)
-                        .background(Color(.systemBackground)).cornerRadius(20).shadow(radius: 2)
-                        .padding(.bottom, -10).zIndex(1)
-                    }
-                    
+                    // Tady už není ta malá bublina, hned následuje panel:
                     DetailStationPanel(
                         station: station,
                         navInfo: routeDistance.isEmpty ? nil : "\(routeDistance) • \(routeTravelTime)",
@@ -177,12 +168,13 @@ struct BrnoView: View {
                                 selectedStation = nil
                                 route = nil
                                 routeDistance = ""
+                                routeTravelTime = ""
                             }
                         }
                     )
                     .transition(.move(edge: .bottom))
+                    .zIndex(2)
                 }
-                .zIndex(2)
             }
 
             // 4. VRSTVA: PLOVOUCÍ TLAČÍTKA (PŘESNĚ SEM!)
@@ -191,35 +183,34 @@ struct BrnoView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    VStack(spacing: 16) { // Mezera mezi tlačítky
-                        // 1. MODRÉ TLAČÍTKO (Rychlá navigace)
+                    VStack(spacing: 16) {
+
+                        // 1️⃣ TLAČÍTKO (Kontejner / Navigace)
                         Button(action: {
-                            withAnimation(.spring()) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                 showNavigationPanel.toggle()
                             }
                         }) {
-                            Image(systemName: "shippingbox.fill") // Nebo "trash.fill"
-                                    .font(.title2)
-                                    .foregroundStyle(.white)
-                                    .frame(width: 56, height: 56)
-                                    .background(Color.red)
-                                    .clipShape(Circle())
-                                    .shadow(radius: 4)
-                            }
+                            Image(systemName: "trash.fill")
+                                .foregroundStyle(showNavigationPanel ? .red : .white)   // 🔁 reversed correctly
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(width: 50, height: 50)
+                                .background(
+                                    Circle()
+                                        .fill(showNavigationPanel ? .white : .red)      // 🔁 reversed correctly
+                                        .shadow(color: .black.opacity(0.15), radius: 4)
+                                )
+                        }
+                        .scaleEffect(showNavigationPanel ? 0.95 : 1.0)
 
-                        // 2. ČERVENÉ TLAČÍTKO (Moje poloha)
+                        // 2️⃣ ČERVENÉ TLAČÍTKO (Moje poloha)
                         Button(action: findMe) {
                             Image(systemName: "location.fill")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .frame(width: 56, height: 56)
-                                .background(Color.red)
-                                .clipShape(Circle())
-                                .shadow(radius: 4)
                         }
+                        .buttonStyle(MagneticButtonStyle(isActive: false)) // independent style
+
                     }
                     .padding(.trailing, 20)
-                    // Tohle zajistí, že tlačítka nebudou pod spodním panelem
                     .padding(.bottom, selectedStation == nil ? 40 : 320)
                 }
             }
