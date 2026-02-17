@@ -12,79 +12,103 @@ import CoreLocation
 
 struct DetailStationPanel: View {
     let station: KontejnerStation
-    // Přidáme novou proměnnou pro text z navigace
     let navInfo: String?
-    
     var onNavigate: () -> Void
     var onClose: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(station.ulice)
-                        .font(.system(size: 18, weight: .bold))
-                    Text("Brno, Česká republika")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-                
-                // Tady se zobrazí informace z navigace (např. 1.5 km • 18 min)
-                if let info = navInfo, !info.isEmpty {
-                    HStack(spacing: 4) {
-                        Image(systemName: "figure.walk")
-                        Text(info)
-                            .font(.system(size: 14, weight: .bold))
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.red.opacity(0.1)) // Jemně červená, aby to ladilo
-                    
-                    .foregroundStyle(.red)
-                    .cornerRadius(10)
-                }
+    @Binding var detent: PresentationDetent
 
-                Button(action: onClose) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.gray.opacity(0.5))
-                        .font(.title2)
-                }
+    private var isCollapsed: Bool { detent == .height(70) }
+
+    var body: some View {
+        Group {
+            if isCollapsed {
+                // ✅ prázdné tělo – systém ukáže jen šedou lištu (grabber)
+                Color.clear
+            } else {
+                content
             }
-            
-            Divider()
-            
+        }
+        .background(Color.white)
+    }
+
+    private var content: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                header
+                Divider()
+                commodityRow
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 120)
+        }
+        .overlay(alignment: .bottom) {
+            bottomCTA
+                .padding(.horizontal, 20)
+                .padding(.bottom, 18)
+                .background(Color.white)
+        }
+    }
+
+    private var header: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(station.ulice)
+                    .font(.system(size: 22, weight: .bold))
+                Text("Brno, Česká republika")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 8)
+
+            if let info = navInfo, !info.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "figure.walk")
+                    Text(info).font(.system(size: 14, weight: .semibold))
+                }
+                .foregroundStyle(.red)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(Color(.systemGray6)))
+            }
+
+            Button(action: onClose) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary.opacity(0.6))
+            }
+        }
+    }
+
+    private var commodityRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(station.komodity, id: \.self) { kom in
                     if let filter = KomoditaFilter.allCases.first(where: { kom.contains($0.rawValue) || $0.rawValue.contains(kom) }) {
                         Image(systemName: filter.iconName)
-                            .font(.system(size: 16))
-                            .frame(width: 38, height: 38)
-                            .background(filter.color.opacity(0.2))
+                            .font(.system(size: 16, weight: .semibold))
+                            .frame(width: 42, height: 42)
+                            .background(filter.color.opacity(0.18))
                             .foregroundStyle(filter.color)
                             .clipShape(Circle())
                     }
                 }
             }
-            
-            Button(action: onNavigate) {
-                HStack {
-                    Image(systemName: "arrow.triangle.turn.up.right.fill")
-                    Text("Navigovat k cíli")
-                        .fontWeight(.bold)
-                }
+            .padding(.vertical, 6)
+        }
+        // ✅ nepřidávej žádné gesture tady
+    }
+
+    private var bottomCTA: some View {
+        Button(action: onNavigate) {
+            Text("Navigovat k cíli")
+                .font(.headline)
                 .frame(maxWidth: .infinity)
-                .frame(height: 54)
+                .frame(height: 56)
                 .background(Color.red)
                 .foregroundStyle(.white)
-                .cornerRadius(16)
-            }
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
-        .padding(20)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 28))
-        .shadow(color: .black.opacity(0.15), radius: 15, x: 0, y: -5)
-        .padding(.horizontal, 16)
     }
 }

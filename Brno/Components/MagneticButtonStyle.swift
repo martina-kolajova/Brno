@@ -7,18 +7,19 @@
 import SwiftUI
 
 struct MagneticButtonStyle: ButtonStyle {
-    var isActive: Bool
+    let isActive: Bool
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 18, weight: .semibold)) // keep original size
-            .foregroundStyle(isActive ? .red : .white)  // 🔁 reversed
-            .frame(width: 50, height: 50)               // keep original frame
+            .font(.system(size: 18, weight: .semibold))
+            .foregroundStyle(configuration.isPressed ? .red : .white)
+            .frame(width: 50, height: 50)
             .background(
                 Circle()
-                    .fill(isActive ? .white : .red)     // 🔁 reversed
+                    .fill(configuration.isPressed ? .white : .red)
                     .shadow(color: .black.opacity(0.15), radius: 4)
             )
-            .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
     }
 }
