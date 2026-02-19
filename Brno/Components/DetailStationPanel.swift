@@ -22,7 +22,7 @@ struct DetailStationPanel: View {
     var body: some View {
         Group {
             if isCollapsed {
-                // ✅ prázdné tělo – systém ukáže jen šedou lištu (grabber)
+            
                 Color.clear
             } else {
                 content
@@ -30,7 +30,6 @@ struct DetailStationPanel: View {
         }
         .background(Color.white)
     }
-
     private var content: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -40,16 +39,18 @@ struct DetailStationPanel: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
-            .padding(.bottom, 120)
+            .padding(.bottom, 20)
         }
-        .overlay(alignment: .bottom) {
-            bottomCTA
-                .padding(.horizontal, 20)
-                .padding(.bottom, 18)
-                .background(Color.white)
+        .safeAreaInset(edge: .bottom) {
+            VStack(spacing: 0) {
+                Divider()
+                bottomCTA
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+            }
+            .background(Color.white)
         }
     }
-
     private var header: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
@@ -99,15 +100,16 @@ struct DetailStationPanel: View {
         }
         // ✅ nepřidávej žádné gesture tady
     }
+    
 
     private var bottomCTA: some View {
         Button(action: onNavigate) {
             Text("Navigovat k cíli")
                 .font(.headline)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(Color.red)
                 .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.red)
                 .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
     }
