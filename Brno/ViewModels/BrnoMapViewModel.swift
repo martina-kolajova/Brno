@@ -26,9 +26,13 @@ final class BrnoMapViewModel: ObservableObject {
     @Published var routeTravelTime = ""
     @Published var detent: PresentationDetent = .height(70)
 
+    // MARK: - User tracking
+
+    @Published var isTracking: Bool = false
+
     // MARK: - Search & filters
 
-    @Published var selectedFilters: Set<KomoditaFilter> = Set(KomoditaFilter.allCases)
+    @Published var selectedFilters: Set<KomoditaFilter> = []
     @Published var activeSearchPoint: CLLocationCoordinate2D?
     @Published var showNavigationPanel = false
 
@@ -56,18 +60,6 @@ final class BrnoMapViewModel: ObservableObject {
 
     func clearStation() {
         selectedStation = nil
-    }
-
-    // MARK: - Center on user (or default Brno)
-
-    func centerOnUser(location: CLLocation) {
-        activeSearchPoint = nil
-        withAnimation(.spring()) {
-            camera = .region(MKCoordinateRegion(
-                center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-            ))
-        }
     }
 
     // MARK: - Address search

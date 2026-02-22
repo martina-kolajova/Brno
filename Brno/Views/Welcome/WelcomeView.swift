@@ -20,6 +20,12 @@ struct WelcomeView: View {
             Color.white.ignoresSafeArea()
             
             VStack(spacing: 12) {
+                Image(systemName: "trash")
+                    .font(.system(size: 64, weight: .black))
+                    .foregroundStyle(dropped ? .red : .black)
+                    .rotationEffect(.degrees(dropped ? -90 : 0), anchor: .bottom)
+                    .offset(x: dropped ? -12 : 0)
+
                 HStack(spacing: 3) {
                     Text("Wasted")
                         .font(.system(size: 44, weight: .black))
@@ -33,6 +39,7 @@ struct WelcomeView: View {
                         .foregroundStyle(.black)
                 }
             }
+            .offset(x: exitOffset)
         }
         .onAppear {
             

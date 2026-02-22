@@ -19,7 +19,36 @@ struct BrnoView: View {
             mapLayer
             controlsLayer
             floatingButtons
+
+            // Quick nav sheet overlaid at bottom
+            if vm.showNavigationPanel {
+                Color.black.opacity(0.25)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.35)) {
+                            vm.showNavigationPanel = false
+                        }
+                    }
+
+                QuickNavButtons(
+                    onSelect: { filter in
+                        withAnimation(.spring(response: 0.35)) {
+                            vm.showNavigationPanel = false
+                        }
+                        vm.startQuickNavigation(for: filter, in: allStations, userLocation: locationManager.effectiveLocation)
+                    },
+                    onDismiss: {
+                        withAnimation(.spring(response: 0.35)) {
+                            vm.showNavigationPanel = false
+                        }
+                    }
+                )
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .padding(.bottom, 0)
+                .zIndex(20)
+            }
         }
+        .animation(.spring(response: 0.35), value: vm.showNavigationPanel)
         .onChange(of: streetQuery) { newValue in
             if isSearchFocused { searchCompleter.update(query: newValue) }
         }
@@ -29,18 +58,21 @@ struct BrnoView: View {
 
     private var mapLayer: some View {
         Map(position: $vm.camera) {
-            ForEach(vm.filteredStations(allStations)) { st in
-                Annotation(st.ulice, coordinate: st.coordinate) {
-                    PiePinView(
-                        station: st,
-                        activeFilters: vm.selectedFilters,
-                        isSelected: vm.selectedStation?.id == st.id,
-                        spanDelta: vm.mapRegion.span.latitudeDelta
-                    )
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            isSearchFocused = false
-                            vm.selectStation(st)
+            // Show pins only when a filter is active
+            if !vm.selectedFilters.isEmpty {
+                ForEach(vm.filteredStations(allStations)) { st in
+                    Annotation(st.ulice, coordinate: st.coordinate) {
+                        PiePinView(
+                            station: st,
+                            activeFilters: vm.selectedFilters,
+                            isSelected: vm.selectedStation?.id == st.id,
+                            spanDelta: vm.mapRegion.span.latitudeDelta
+                        )
+                        .onTapGesture {
+                            withAnimation(.spring()) {
+                                isSearchFocused = false
+                                vm.selectStation(st)
+                            }
                         }
                     }
                 }
@@ -61,9 +93,13 @@ struct BrnoView: View {
                     .stroke(.red, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             }
 
+            // Always show the blue GPS dot
             UserAnnotation()
         }
-        .onMapCameraChange { context in vm.mapRegion = context.region }
+        .mapStyle(.standard)
+        .onMapCameraChange { context in
+            vm.mapRegion = context.region
+        }
         .ignoresSafeArea()
         .sheet(item: $vm.selectedStation) { station in
             DetailStationPanel(
@@ -90,14 +126,6 @@ struct BrnoView: View {
 
             if isSearchFocused && !searchCompleter.results.isEmpty {
                 searchSuggestions
-            }
-
-            if vm.showNavigationPanel {
-                QuickNavButtons { filter in
-                    vm.startQuickNavigation(for: filter, in: allStations, userLocation: locationManager.effectiveLocation)
-                }
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .padding(.top, 10)
             }
 
             Spacer()
@@ -142,6 +170,7 @@ struct BrnoView: View {
             HStack {
                 Spacer()
                 VStack(spacing: 16) {
+                    // Trash / find nearest
                     Button {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             vm.showNavigationPanel.toggle()
@@ -159,12 +188,32 @@ struct BrnoView: View {
                     }
                     .scaleEffect(vm.showNavigationPanel ? 0.95 : 1.0)
 
+                    // Location arrow — toggles color, centers on user or Brno
                     Button {
-                        vm.centerOnUser(location: locationManager.effectiveLocation)
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            vm.isTracking.toggle()
+                        }
+                        let coord = locationManager.isInBrno
+                            ? locationManager.effectiveLocation.coordinate
+                            : LocationManager.defaultBrnoCoordinate
+                        withAnimation(.spring()) {
+                            vm.camera = .region(MKCoordinateRegion(
+                                center: coord,
+                                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                            ))
+                        }
                     } label: {
                         Image(systemName: "location.fill")
+                            .foregroundStyle(vm.isTracking ? .red : .white)
+                            .font(.system(size: 18, weight: .semibold))
+                            .frame(width: 50, height: 50)
+                            .background(
+                                Circle()
+                                    .fill(vm.isTracking ? .white : .red)
+                                    .shadow(color: .black.opacity(0.15), radius: 4)
+                            )
                     }
-                    .buttonStyle(MagneticButtonStyle(isActive: false))
+                    .scaleEffect(vm.isTracking ? 0.95 : 1.0)
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, vm.selectedStation == nil ? 40 : 320)
