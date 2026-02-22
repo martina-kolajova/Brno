@@ -6,23 +6,14 @@
 //
 
 import SwiftUI
-import CoreLocation
 
-
-struct KontejnerStation: Identifiable {
-    let id: String
-    let title: String
-    let ulice: String
-    let cp: String?
-    let komodity: [String]
-    let coordinate: CLLocationCoordinate2D
-}
+// MARK: - Waste Category Filter
 
 enum KomoditaFilter: String, CaseIterable, Identifiable {
     case papir = "Papír"
-    case plast = "Plast" // Zjednodušeno pro porovnávání
+    case plast = "Plast"
     case bio = "Bio"
-    case sklo = "Sklo"  // Sjednoceno
+    case sklo = "Sklo"
     case textil = "Textil"
 
     var id: String { rawValue }
@@ -32,11 +23,11 @@ enum KomoditaFilter: String, CaseIterable, Identifiable {
         case .papir: return .blue
         case .plast: return .yellow
         case .bio: return .brown
-        case .sklo: return .green // Pokud ho chceš modré jako na screenshotu
+        case .sklo: return .green
         case .textil: return .purple
         }
     }
-    
+
     var displayName: String {
         switch self {
         case .papir: return "Papír"
@@ -46,7 +37,7 @@ enum KomoditaFilter: String, CaseIterable, Identifiable {
         case .textil: return "Textil"
         }
     }
-    
+
     var iconName: String {
         switch self {
         case .papir: return "doc.text"
@@ -55,19 +46,5 @@ enum KomoditaFilter: String, CaseIterable, Identifiable {
         case .sklo: return "wineglass"
         case .textil: return "tshirt"
         }
-    }
-}
-
-extension KontejnerStation {
-    // Upravená funkce matches, aby stačila částečná shoda (např. "Sklo" najde "Sklo bílé")
-    func matches(_ filter: KomoditaFilter) -> Bool {
-        komodity.contains { $0.lowercased().contains(filter.rawValue.lowercased()) }
-    }
-
-    func dominantFilter() -> KomoditaFilter? {
-        for f in KomoditaFilter.allCases {
-            if matches(f) { return f }
-        }
-        return nil
     }
 }

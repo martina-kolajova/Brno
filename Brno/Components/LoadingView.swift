@@ -9,7 +9,7 @@ import SwiftUI
 
 
 
-struct LoadingView: View { // <--- Tohle : View tam musí být!
+struct LoadingView: View {
     @State private var rotation: Double = 0
 
     var body: some View {

@@ -6,7 +6,7 @@
 import SwiftUI
 
 
-struct OrlojStatsView: View {
+struct WasteStatsChart: View {
     let stats: KontejnerStats?
     let showNumbers: Bool
     var onSelect: (WasteKind) -> Void

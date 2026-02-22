@@ -1,5 +1,5 @@
 //
-//  InfoView 2.swift
+//  InfoView.swift
 //  Brno
 //
 //  Created by Martina Kolajová on 06.02.2026.
@@ -18,7 +18,7 @@ struct InfoView: View {
             Color.white.ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 10) {
-                // TEXTOVÁ SEKCE
+                // Title section
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Brno, Brno")
                         .font(.system(size: 34, weight: .bold))
@@ -43,7 +43,7 @@ struct InfoView: View {
 
                 // ORLOJ
                 if viewModel.showOrloj {
-                    OrlojStatsView(stats: stats, showNumbers: viewModel.showNumbers) { kind in
+                    WasteStatsChart(stats: stats, showNumbers: viewModel.showNumbers) { kind in
                         viewModel.selectedCategory = kind
                     }
                     .frame(height: 500)

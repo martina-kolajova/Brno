@@ -46,27 +46,3 @@ struct QuickNavButtons: View {
         .padding(.horizontal, 16)
     }
 }
-//struct QuickNavButtons: View {
-//    var onSelect: (KomoditaFilter) -> Void
-//    var body: some View {
-//        ScrollView(.horizontal, showsIndicators: false) {
-//            HStack(spacing: 12) {
-//                ForEach(KomoditaFilter.allCases) { filter in
-//                    Button { onSelect(filter) } label: {
-//                        VStack(spacing: 4) {
-//                            Image(systemName: filter.iconName).font(.title3)
-//                            Text(filter.displayName)
-//                                .font(.system(size: 10, weight: .bold))
-//                                .lineLimit(1)
-//                        }
-//                        .foregroundStyle(.white).frame(width: 70, height: 70)
-//                        .background(filter.color).clipShape(RoundedRectangle(cornerRadius: 15))
-//                    }
-//                }
-//            }
-//            .padding(.horizontal, 16).padding(.vertical, 8)
-//        }
-//        .background(Color.white.opacity(0.95)).cornerRadius(20).padding(.horizontal, 16)
-//    }
-//}
-//

@@ -79,8 +79,3 @@ extension Color {
         self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: 1)
     }
 }
-struct KontejnerStats: Equatable {
-    let totalContainers: Int
-    let totalStations: Int
-    let byKind: [WasteKind: Int]
-}
