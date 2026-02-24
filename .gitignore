@@ -1,0 +1,59 @@
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+
+# Xcode user-specific files
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+
+# IDE & Editor files
+.DS_Store
+*.swp
+*.orig
+*~
+
+# Build products
+build/
+DerivedData/
+*.o
+*.a
+*.framework
+*.app
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# CocoaPods
+Pods/
+*.xcworkspace
+!default.xcworkspace
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Environment & secrets
+*.env
+*.pem
+*.p12
+*.mobileprovision
+AuthKey_*.p8
+
+# Test results
+*.xcresult

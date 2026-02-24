@@ -19,23 +19,20 @@ struct WelcomeView: View {
         ZStack {
             Color.white.ignoresSafeArea()
             
-            VStack(spacing: 12) {
+            VStack(spacing: 60) {
                 Image(systemName: "trash")
-                    .font(.system(size: 64, weight: .black))
+                    .font(.system(size: 60, weight: .medium))
                     .foregroundStyle(dropped ? .red : .black)
-                    .rotationEffect(.degrees(dropped ? -90 : 0), anchor: .bottom)
+                    .rotationEffect(.degrees(dropped ? -180 : 0), anchor: .bottom)
                     .offset(x: dropped ? -12 : 0)
 
                 HStack(spacing: 3) {
                     Text("Wasted")
-                        .font(.system(size: 44, weight: .black))
+                        .font(.system(size: 44, weight: .medium))
                         .foregroundStyle(dropped ? .red : .black)
-                        .rotationEffect(.degrees(dropped ? -12 : 0), anchor: .bottomTrailing)
-                        .scaleEffect(dropped ? 0.97 : 1.0, anchor: .bottomTrailing)
-                        .offset(y: dropped ? 2 : 0)
                     
                     Text("Brno")
-                        .font(.system(size: 44, weight: .black))
+                        .font(.system(size: 44, weight: .medium))
                         .foregroundStyle(.black)
                 }
             }
@@ -70,6 +67,34 @@ struct WelcomeView: View {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+// MARK: - Preview
+
+#Preview("Default") {
+    WelcomeView(onFinished: {})
+}
+
+#Preview("Fallen") {
+    ZStack {
+        Color.white.ignoresSafeArea()
+        VStack(spacing: 60) {
+            Image(systemName: "trash")
+                .font(.system(size: 60, weight: .regular))
+                .foregroundStyle(.red)
+                .rotationEffect(.degrees(-180), anchor: .bottom)
+                .offset(x: -12)
+
+            HStack(spacing: 3) {
+                Text("Wasted")
+                    .font(.system(size: 44, weight: .regular))
+                    .foregroundStyle(.red)
+                Text("Brno")
+                    .font(.system(size: 44, weight: .regular))
+                    .foregroundStyle(.black)
             }
         }
     }

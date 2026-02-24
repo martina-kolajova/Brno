@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Station Map Pin
 
-struct PiePinView: View {
+struct PieChart: View {
     let station: KontejnerStation
     let activeFilters: Set<KomoditaFilter>
     let isSelected: Bool

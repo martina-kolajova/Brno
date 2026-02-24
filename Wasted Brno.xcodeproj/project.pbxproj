@@ -29,18 +29,18 @@
 
 /* Begin PBXFileReference section */
 		2A1ECC992F398A0A00A12850 /* Brno.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brno.gpx; sourceTree = "<group>"; };
-		2AA3FAED2F29A47A00194DE9 /* Brno.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Brno.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AA3FAFA2F29A47B00194DE9 /* BrnoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrnoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AA3FB042F29A47B00194DE9 /* BrnoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrnoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2AA3FAED2F29A47A00194DE9 /* Wasted Brno.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wasted Brno.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2AA3FAFA2F29A47B00194DE9 /* Wasted BrnoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wasted BrnoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2AA3FB042F29A47B00194DE9 /* Wasted BrnoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wasted BrnoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Brno" target */ = {
+		2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Wasted Brno" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 2AA3FAEC2F29A47A00194DE9 /* Brno */;
+			target = 2AA3FAEC2F29A47A00194DE9 /* Wasted Brno */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -48,7 +48,7 @@
 		2AA3FAEF2F29A47A00194DE9 /* Brno */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Brno" target */,
+				2A1ECC9C2F398D6100A12850 /* Exceptions for "Brno" folder in "Wasted Brno" target */,
 			);
 			path = Brno;
 			sourceTree = "<group>";
@@ -104,9 +104,9 @@
 		2AA3FAEE2F29A47A00194DE9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2AA3FAED2F29A47A00194DE9 /* Brno.app */,
-				2AA3FAFA2F29A47B00194DE9 /* BrnoTests.xctest */,
-				2AA3FB042F29A47B00194DE9 /* BrnoUITests.xctest */,
+				2AA3FAED2F29A47A00194DE9 /* Wasted Brno.app */,
+				2AA3FAFA2F29A47B00194DE9 /* Wasted BrnoTests.xctest */,
+				2AA3FB042F29A47B00194DE9 /* Wasted BrnoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,9 +114,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2AA3FAEC2F29A47A00194DE9 /* Brno */ = {
+		2AA3FAEC2F29A47A00194DE9 /* Wasted Brno */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2AA3FB0E2F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Brno" */;
+			buildConfigurationList = 2AA3FB0E2F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted Brno" */;
 			buildPhases = (
 				2AA3FAE92F29A47A00194DE9 /* Sources */,
 				2AA3FAEA2F29A47A00194DE9 /* Frameworks */,
@@ -129,16 +129,16 @@
 			fileSystemSynchronizedGroups = (
 				2AA3FAEF2F29A47A00194DE9 /* Brno */,
 			);
-			name = Brno;
+			name = "Wasted Brno";
 			packageProductDependencies = (
 			);
 			productName = Brno;
-			productReference = 2AA3FAED2F29A47A00194DE9 /* Brno.app */;
+			productReference = 2AA3FAED2F29A47A00194DE9 /* Wasted Brno.app */;
 			productType = "com.apple.product-type.application";
 		};
-		2AA3FAF92F29A47B00194DE9 /* BrnoTests */ = {
+		2AA3FAF92F29A47B00194DE9 /* Wasted BrnoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2AA3FB112F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "BrnoTests" */;
+			buildConfigurationList = 2AA3FB112F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted BrnoTests" */;
 			buildPhases = (
 				2AA3FAF62F29A47B00194DE9 /* Sources */,
 				2AA3FAF72F29A47B00194DE9 /* Frameworks */,
@@ -152,16 +152,16 @@
 			fileSystemSynchronizedGroups = (
 				2AA3FAFD2F29A47B00194DE9 /* BrnoTests */,
 			);
-			name = BrnoTests;
+			name = "Wasted BrnoTests";
 			packageProductDependencies = (
 			);
 			productName = BrnoTests;
-			productReference = 2AA3FAFA2F29A47B00194DE9 /* BrnoTests.xctest */;
+			productReference = 2AA3FAFA2F29A47B00194DE9 /* Wasted BrnoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2AA3FB032F29A47B00194DE9 /* BrnoUITests */ = {
+		2AA3FB032F29A47B00194DE9 /* Wasted BrnoUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2AA3FB142F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "BrnoUITests" */;
+			buildConfigurationList = 2AA3FB142F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted BrnoUITests" */;
 			buildPhases = (
 				2AA3FB002F29A47B00194DE9 /* Sources */,
 				2AA3FB012F29A47B00194DE9 /* Frameworks */,
@@ -175,11 +175,11 @@
 			fileSystemSynchronizedGroups = (
 				2AA3FB072F29A47B00194DE9 /* BrnoUITests */,
 			);
-			name = BrnoUITests;
+			name = "Wasted BrnoUITests";
 			packageProductDependencies = (
 			);
 			productName = BrnoUITests;
-			productReference = 2AA3FB042F29A47B00194DE9 /* BrnoUITests.xctest */;
+			productReference = 2AA3FB042F29A47B00194DE9 /* Wasted BrnoUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -190,7 +190,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					2AA3FAEC2F29A47A00194DE9 = {
 						CreatedOnToolsVersion = 16.4;
@@ -205,7 +205,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2AA3FAE82F29A47A00194DE9 /* Build configuration list for PBXProject "Brno" */;
+			buildConfigurationList = 2AA3FAE82F29A47A00194DE9 /* Build configuration list for PBXProject "Wasted Brno" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -219,9 +219,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2AA3FAEC2F29A47A00194DE9 /* Brno */,
-				2AA3FAF92F29A47B00194DE9 /* BrnoTests */,
-				2AA3FB032F29A47B00194DE9 /* BrnoUITests */,
+				2AA3FAEC2F29A47A00194DE9 /* Wasted Brno */,
+				2AA3FAF92F29A47B00194DE9 /* Wasted BrnoTests */,
+				2AA3FB032F29A47B00194DE9 /* Wasted BrnoUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -278,12 +278,12 @@
 /* Begin PBXTargetDependency section */
 		2AA3FAFC2F29A47B00194DE9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2AA3FAEC2F29A47A00194DE9 /* Brno */;
+			target = 2AA3FAEC2F29A47A00194DE9 /* Wasted Brno */;
 			targetProxy = 2AA3FAFB2F29A47B00194DE9 /* PBXContainerItemProxy */;
 		};
 		2AA3FB062F29A47B00194DE9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 2AA3FAEC2F29A47A00194DE9 /* Brno */;
+			target = 2AA3FAEC2F29A47A00194DE9 /* Wasted Brno */;
 			targetProxy = 2AA3FB052F29A47B00194DE9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -348,6 +348,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -405,6 +406,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -489,7 +491,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Brno.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Brno";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wasted Brno.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wasted Brno";
 			};
 			name = Debug;
 		};
@@ -508,7 +510,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Brno.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Brno";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Wasted Brno.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Wasted Brno";
 			};
 			name = Release;
 		};
@@ -549,7 +551,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2AA3FAE82F29A47A00194DE9 /* Build configuration list for PBXProject "Brno" */ = {
+		2AA3FAE82F29A47A00194DE9 /* Build configuration list for PBXProject "Wasted Brno" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2AA3FB0C2F29A47B00194DE9 /* Debug */,
@@ -558,7 +560,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2AA3FB0E2F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Brno" */ = {
+		2AA3FB0E2F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted Brno" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2AA3FB0F2F29A47B00194DE9 /* Debug */,
@@ -567,7 +569,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2AA3FB112F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "BrnoTests" */ = {
+		2AA3FB112F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted BrnoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2AA3FB122F29A47B00194DE9 /* Debug */,
@@ -576,7 +578,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2AA3FB142F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "BrnoUITests" */ = {
+		2AA3FB142F29A47B00194DE9 /* Build configuration list for PBXNativeTarget "Wasted BrnoUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2AA3FB152F29A47B00194DE9 /* Debug */,

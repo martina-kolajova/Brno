@@ -62,7 +62,7 @@ struct BrnoView: View {
             if !vm.selectedFilters.isEmpty {
                 ForEach(vm.filteredStations(allStations)) { st in
                     Annotation(st.ulice, coordinate: st.coordinate) {
-                        PiePinView(
+                        PieChart(
                             station: st,
                             activeFilters: vm.selectedFilters,
                             isSelected: vm.selectedStation?.id == st.id,
