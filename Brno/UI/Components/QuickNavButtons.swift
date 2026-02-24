@@ -12,71 +12,70 @@ struct QuickNavButtons: View {
     var onSelect: (KomoditaFilter) -> Void
     var onDismiss: () -> Void
 
+    @State private var selected: KomoditaFilter? = nil
+
     var body: some View {
         VStack(spacing: 0) {
-            // Handle + header
-            VStack(spacing: 8) {
+            // Minimalist header
+            VStack(spacing: 4) {
                 Capsule()
                     .fill(Color(.systemGray4))
-                    .frame(width: 36, height: 4)
-                    .padding(.top, 12)
+                    .frame(width: 24, height: 3)
+                    .padding(.top, 6)
 
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Find Nearest Container")
-                            .font(.system(size: 16, weight: .bold))
-                        Text("Navigate to the closest bin by type")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                    }
+                    Text("Find Nearest Container")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.red)
                     Spacer()
                     Button(action: onDismiss) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundStyle(Color(.systemGray3))
+                            .font(.system(size: 18))
+                            .foregroundColor(Color(.systemGray3))
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 10)
+                .padding(.bottom, 2)
             }
 
             Divider()
 
-            // Container type grid
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(KomoditaFilter.allCases) { filter in
-                    Button { onSelect(filter) } label: {
-                        VStack(spacing: 8) {
-                            ZStack {
+            // Compact container type grid
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
+                    ForEach(KomoditaFilter.allCases) { filter in
+                        Button {
+                            selected = filter
+                            onSelect(filter)
+                        } label: {
+                            VStack(spacing: 4) {
                                 Circle()
-                                    .fill(filter.color.opacity(0.15))
-                                    .frame(width: 52, height: 52)
-                                Image(systemName: filter.iconName)
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundStyle(filter.color)
+                                    .fill(selected == filter ? Color.red : filter.color.opacity(0.18))
+                                    .frame(width: 28, height: 28)
+                                    .overlay(
+                                        Image(systemName: filter.iconName)
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundColor(selected == filter ? .white : filter.color)
+                                    )
+                                Text(filter.displayName)
+                                    .font(.system(size: 9, weight: .semibold))
+                                    .foregroundColor(selected == filter ? .red : .primary)
                             }
-                            Text(filter.displayName)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(Color(.secondarySystemBackground))
-                        )
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 6)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
 
-            // Bottom safe area spacer
-            Color.clear.frame(height: 8)
+            Color.clear.frame(height: 2)
         }
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .shadow(color: .black.opacity(0.12), radius: 16, y: -4)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .shadow(color: .black.opacity(0.08), radius: 6, y: -1)
+        .frame(maxHeight: 180)
     }
 }

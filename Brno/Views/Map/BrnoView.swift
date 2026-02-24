@@ -58,13 +58,13 @@ struct BrnoView: View {
 
     private var mapLayer: some View {
         Map(position: $vm.camera) {
-            // Show pins only when a filter is active
-            if !vm.selectedFilters.isEmpty {
+            // Show pins when a filter chip is active OR when navigating
+            if !vm.effectiveFilters.isEmpty {
                 ForEach(vm.filteredStations(allStations)) { st in
                     Annotation(st.ulice, coordinate: st.coordinate) {
                         PieChart(
                             station: st,
-                            activeFilters: vm.selectedFilters,
+                            activeFilters: vm.effectiveFilters,
                             isSelected: vm.selectedStation?.id == st.id,
                             spanDelta: vm.mapRegion.span.latitudeDelta
                         )
@@ -167,9 +167,27 @@ struct BrnoView: View {
     private var floatingButtons: some View {
         VStack {
             Spacer()
+
             HStack {
                 Spacer()
                 VStack(spacing: 16) {
+                    // Stop navigation — small x button, only shown when navigating
+                    if vm.isNavigating {
+                        Button {
+                            withAnimation(.spring(response: 0.35)) {
+                                vm.stopNavigation()
+                            }
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.white)
+                                .frame(width: 36, height: 36)
+                                .background(Circle().fill(Color.red))
+                                .shadow(color: .black.opacity(0.15), radius: 4)
+                        }
+                        .transition(.scale.combined(with: .opacity))
+                    }
+
                     // Trash / find nearest
                     Button {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -188,7 +206,7 @@ struct BrnoView: View {
                     }
                     .scaleEffect(vm.showNavigationPanel ? 0.95 : 1.0)
 
-                    // Location arrow — toggles color, centers on user or Brno
+                    // Location arrow
                     Button {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             vm.isTracking.toggle()
@@ -219,6 +237,7 @@ struct BrnoView: View {
                 .padding(.bottom, vm.selectedStation == nil ? 40 : 320)
             }
         }
+        .animation(.spring(response: 0.35), value: vm.isNavigating)
         .zIndex(10)
     }
 }

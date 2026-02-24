@@ -20,7 +20,7 @@ struct FiltersBar: View {
                     .foregroundColor(.gray)
                     .font(.system(size: 16, weight: .semibold))
 
-                TextField("Search street in Brno...", text: $streetQuery)
+                TextField("Hledej ulicu v Štatlu...", text: $streetQuery)
                     .textFieldStyle(.plain)
                     .foregroundColor(.black)
                     .tint(.red)

@@ -36,11 +36,24 @@ final class BrnoMapViewModel: ObservableObject {
     @Published var activeSearchPoint: CLLocationCoordinate2D?
     @Published var showNavigationPanel = false
 
+    // MARK: - Navigation state
+
+    @Published var isNavigating: Bool = false
+    @Published var activeNavFilter: KomoditaFilter? = nil
+
+    /// Combines selected filter chips + active nav filter so pins always show during navigation
+    var effectiveFilters: Set<KomoditaFilter> {
+        var filters = selectedFilters
+        if let nav = activeNavFilter { filters.insert(nav) }
+        return filters
+    }
+
     // MARK: - Filtering
 
     func filteredStations(_ all: [KontejnerStation]) -> [KontejnerStation] {
-        all.filter { station in
-            selectedFilters.isEmpty || selectedFilters.contains { station.matches($0) }
+        let active = effectiveFilters
+        return all.filter { station in
+            active.isEmpty || active.contains { station.matches($0) }
         }
     }
 
@@ -60,6 +73,24 @@ final class BrnoMapViewModel: ObservableObject {
 
     func clearStation() {
         selectedStation = nil
+        route = nil
+        routeDistance = ""
+        routeTravelTime = ""
+    }
+
+    func stopNavigation() {
+        route = nil
+        routeDistance = ""
+        routeTravelTime = ""
+        selectedStation = nil
+        isNavigating = false
+        activeNavFilter = nil
+        withAnimation(.spring()) {
+            camera = .region(MKCoordinateRegion(
+                center: LocationManager.defaultBrnoCoordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            ))
+        }
     }
 
     // MARK: - Address search
@@ -83,6 +114,8 @@ final class BrnoMapViewModel: ObservableObject {
     func startQuickNavigation(for filter: KomoditaFilter, in stations: [KontejnerStation], userLocation: CLLocation) {
         let base = activeSearchPoint ?? userLocation.coordinate
         if let nearest = findNearest(to: base, for: filter, in: stations) {
+            activeNavFilter = filter
+            isNavigating = true
             selectStation(nearest)
             showNavigationPanel = false
         }
