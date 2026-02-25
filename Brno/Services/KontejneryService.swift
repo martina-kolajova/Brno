@@ -11,31 +11,98 @@ protocol KontejneryServicing {
 
 final class KontejneryService: KontejneryServicing {
 
-    private let baseURL: URL
+    private let baseEndpoint = "https://services6.arcgis.com/fUWVlHWZNxUvTUh8/arcgis/rest/services/kontejnery_separovany/FeatureServer/0/query"
+    private let pageSize = 1000
+    private let maxRetries = 3
 
-    init(baseURL: URL = URL(string:
-        "https://services6.arcgis.com/fUWVlHWZNxUvTUh8/arcgis/rest/services/kontejnery_separovany/FeatureServer/0/query"
-        + "?where=1%3D1"
-        + "&outFields=stanoviste_ogc_fid,nazev,komodita_odpad_separovany,ulice,cp"
-        + "&returnGeometry=true"
-        + "&outSR=4326"
-        + "&f=geojson"
-        + "&resultType=standard"
-        + "&resultRecordCount=1000"
-    )!) {
-        self.baseURL = baseURL
+    /// URLSession with a 15s timeout so requests don't hang forever.
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 15
+        config.timeoutIntervalForResource = 60
+        return URLSession(configuration: config)
+    }()
+
+    /// Fetches ALL container data using paginated requests, then computes stats + grouped stations.
+    func fetchAllData() async throws -> (stats: KontejnerStats, stations: [KontejnerStation]) {
+
+        // 1. Get total count (tiny request, no geometry)
+        let total = try await fetchTotalCount()
+        guard total > 0 else { return (KontejnerStats(totalContainers: 0, totalStations: 0, byKind: [:]), []) }
+
+        // 2. Fetch all pages concurrently
+        let pageCount = Int(ceil(Double(total) / Double(pageSize)))
+        var allFeatures: [GeoJSONFeature] = []
+        allFeatures.reserveCapacity(total)
+
+        try await withThrowingTaskGroup(of: [GeoJSONFeature].self) { group in
+            for page in 0..<pageCount {
+                let offset = page * pageSize
+                group.addTask { [self] in
+                    try await self.fetchPage(offset: offset)
+                }
+            }
+            for try await features in group {
+                allFeatures.append(contentsOf: features)
+            }
+        }
+
+        // 3. Build result from all features in a single pass
+        return buildResult(from: allFeatures)
     }
 
-    /// Fetches all container data and computes stats + grouped stations in a single pass.
-    func fetchAllData() async throws -> (stats: KontejnerStats, stations: [KontejnerStation]) {
-        let (data, response) = try await URLSession.shared.data(from: baseURL)
+    // MARK: - Private API calls
 
+    /// Returns the total number of features without downloading any data.
+    private func fetchTotalCount() async throws -> Int {
+        var components = URLComponents(string: baseEndpoint)!
+        components.queryItems = [
+            URLQueryItem(name: "where", value: "1=1"),
+            URLQueryItem(name: "returnCountOnly", value: "true"),
+            URLQueryItem(name: "f", value: "json")
+        ]
+        let (data, response) = try await session.data(from: components.url!)
+        try validateResponse(response)
+
+        struct CountResponse: Decodable { let count: Int }
+        return try JSONDecoder().decode(CountResponse.self, from: data).count
+    }
+
+    /// Fetches a single page of features with retry logic.
+    private func fetchPage(offset: Int) async throws -> [GeoJSONFeature] {
+        var components = URLComponents(string: baseEndpoint)!
+        components.queryItems = [
+            URLQueryItem(name: "where", value: "1=1"),
+            URLQueryItem(name: "outFields", value: "stanoviste_ogc_fid,nazev,komodita_odpad_separovany,ulice,cp"),
+            URLQueryItem(name: "returnGeometry", value: "true"),
+            URLQueryItem(name: "outSR", value: "4326"),
+            URLQueryItem(name: "f", value: "geojson"),
+            URLQueryItem(name: "resultRecordCount", value: "\(pageSize)"),
+            URLQueryItem(name: "resultOffset", value: "\(offset)")
+        ]
+
+        var lastError: Error?
+        for attempt in 1...maxRetries {
+            do {
+                let (data, response) = try await session.data(from: components.url!)
+                try validateResponse(response)
+                return try JSONDecoder().decode(GeoJSONResponse.self, from: data).features
+            } catch {
+                lastError = error
+                if attempt < maxRetries {
+                    // Exponential backoff: 1s, 2s, 4s
+                    try? await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(attempt - 1))) * 1_000_000_000)
+                }
+            }
+        }
+        throw lastError ?? ServiceError.httpError(statusCode: -1)
+    }
+
+    /// Validates HTTP response status code.
+    private func validateResponse(_ response: URLResponse) throws {
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw ServiceError.httpError(statusCode: http.statusCode)
         }
-
-        let collection = try JSONDecoder().decode(GeoJSONResponse.self, from: data)
-        return buildResult(from: collection.features)
     }
 }
 

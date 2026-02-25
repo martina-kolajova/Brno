@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import Combine
 
 // MARK: - Map ViewModel
 
@@ -41,19 +42,87 @@ final class BrnoMapViewModel: ObservableObject {
     @Published var isNavigating: Bool = false
     @Published var activeNavFilter: KomoditaFilter? = nil
 
-    /// Combines selected filter chips + active nav filter so pins always show during navigation
+    // MARK: - Visible stations (pre-filtered, capped, background-computed)
+
+    @Published var visibleStations: [KontejnerStation] = []
+    private let maxAnnotations = 200
+    private var allStationsCache: [KontejnerStation] = []
+    private var filterTask: Task<Void, Never>?
+    private var regionSubject = PassthroughSubject<Void, Never>()
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        // Debounce region/filter changes — recompute after 250ms of no changes
+        regionSubject
+            .debounce(for: .milliseconds(250), scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.recomputeVisibleStations() }
+            .store(in: &cancellables)
+    }
+
+    /// Call once when stations are loaded.
+    func setAllStations(_ stations: [KontejnerStation]) {
+        allStationsCache = stations
+        triggerRecompute()
+    }
+
+    /// Called on every map camera change.
+    func onRegionChanged(_ region: MKCoordinateRegion) {
+        mapRegion = region
+        triggerRecompute()
+    }
+
+    /// Triggers a debounced recompute of visible stations.
+    func triggerRecompute() {
+        regionSubject.send()
+    }
+
+    /// Combines selected filter chips + active nav filter.
     var effectiveFilters: Set<KomoditaFilter> {
         var filters = selectedFilters
         if let nav = activeNavFilter { filters.insert(nav) }
         return filters
     }
 
-    // MARK: - Filtering
+    // MARK: - Background filtering
 
-    func filteredStations(_ all: [KontejnerStation]) -> [KontejnerStation] {
-        let active = effectiveFilters
-        return all.filter { station in
-            active.isEmpty || active.contains { station.matches($0) }
+    private func recomputeVisibleStations() {
+        filterTask?.cancel()
+
+        let filters = effectiveFilters
+        let region = mapRegion
+        let stations = allStationsCache
+        let cap = maxAnnotations
+
+        // No filters active → empty map (no pins)
+        guard !filters.isEmpty else {
+            visibleStations = []
+            return
+        }
+
+        filterTask = Task.detached(priority: .userInitiated) { [weak self] in
+            // 1. Bounding box — only stations visible on screen
+            let minLat = region.center.latitude - region.span.latitudeDelta / 2
+            let maxLat = region.center.latitude + region.span.latitudeDelta / 2
+            let minLon = region.center.longitude - region.span.longitudeDelta / 2
+            let maxLon = region.center.longitude + region.span.longitudeDelta / 2
+
+            let result = stations.filter { st in
+                guard !Task.isCancelled else { return false }
+                let lat = st.coordinate.latitude
+                let lon = st.coordinate.longitude
+                let inBounds = lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon
+                guard inBounds else { return false }
+                return filters.contains { st.matches($0) }
+            }
+
+            // 2. Cap to prevent UI overload
+            let capped = result.count > cap ? Array(result.prefix(cap)) : result
+
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                self?.visibleStations = capped
+            }
         }
     }
 
@@ -85,6 +154,7 @@ final class BrnoMapViewModel: ObservableObject {
         selectedStation = nil
         isNavigating = false
         activeNavFilter = nil
+        activeSearchPoint = nil
         withAnimation(.spring()) {
             camera = .region(MKCoordinateRegion(
                 center: LocationManager.defaultBrnoCoordinate,
@@ -107,6 +177,11 @@ final class BrnoMapViewModel: ObservableObject {
                 ))
             }
         }
+    }
+
+    /// Clears the search point so user location is used again as the origin.
+    func clearSearchPoint() {
+        activeSearchPoint = nil
     }
 
     // MARK: - Quick navigation (find nearest)

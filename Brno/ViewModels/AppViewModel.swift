@@ -8,6 +8,7 @@ final class AppViewModel: ObservableObject {
     @Published var stats: KontejnerStats?
     @Published var allStations: [KontejnerStation] = []
     @Published var isLoading = true
+    @Published var loadError: String?
 
     private let service: KontejneryServicing
 
@@ -16,9 +17,13 @@ final class AppViewModel: ObservableObject {
     }
 
     func loadData() async {
+        isLoading = true
+        loadError = nil
+
         do {
             let result = try await service.fetchAllData()
             stats = result.stats
+            allStations = result.stations
 
             // Brief delay so the loading screen doesn't flash
             try? await Task.sleep(nanoseconds: 1_300_000_000)
@@ -26,10 +31,11 @@ final class AppViewModel: ObservableObject {
             withAnimation(.easeInOut(duration: 0.5)) {
                 isLoading = false
             }
-
-            allStations = result.stations
         } catch {
-            isLoading = false
+            withAnimation {
+                loadError = error.localizedDescription
+                isLoading = false
+            }
         }
     }
 }

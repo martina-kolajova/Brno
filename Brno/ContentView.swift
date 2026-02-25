@@ -14,6 +14,30 @@ struct ContentView: View {
         ZStack {
             if vm.isLoading {
                 LoadingView()
+            } else if let error = vm.loadError {
+                // Error state with retry
+                VStack(spacing: 16) {
+                    Image(systemName: "wifi.slash")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.red)
+                    Text("Failed to load data")
+                        .font(.headline)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                    Button {
+                        Task { await vm.loadData() }
+                    } label: {
+                        Text("Retry")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 28)
+                            .padding(.vertical, 12)
+                            .background(Capsule().fill(.red))
+                    }
+                }
+                .padding(40)
             } else {
                 TabView(selection: $vm.selectedTab) {
                     WelcomeView(onFinished: {

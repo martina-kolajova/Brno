@@ -24,7 +24,7 @@ struct QuickNavButtons: View {
                     .padding(.top, 6)
 
                 HStack {
-                    Text("Find Nearest Container")
+                    Text("Kam s tým?")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.red)
                     Spacer()

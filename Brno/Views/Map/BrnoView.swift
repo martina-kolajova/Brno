@@ -20,7 +20,7 @@ struct BrnoView: View {
             controlsLayer
             floatingButtons
 
-            // Quick nav sheet overlaid at bottom
+            // Quick nav sheet
             if vm.showNavigationPanel {
                 Color.black.opacity(0.25)
                     .ignoresSafeArea()
@@ -44,13 +44,24 @@ struct BrnoView: View {
                     }
                 )
                 .transition(.move(edge: .bottom).combined(with: .opacity))
-                .padding(.bottom, 0)
                 .zIndex(20)
             }
         }
         .animation(.spring(response: 0.35), value: vm.showNavigationPanel)
-        .onChange(of: streetQuery) { newValue in
-            if isSearchFocused { searchCompleter.update(query: newValue) }
+        .onAppear {
+            vm.setAllStations(allStations)
+        }
+        .onChange(of: streetQuery) { _, newValue in
+            if isSearchFocused {
+                searchCompleter.update(query: newValue)
+            }
+            // Clear search point when user deletes the street text
+            if newValue.isEmpty {
+                vm.clearSearchPoint()
+            }
+        }
+        .onChange(of: vm.selectedFilters) {
+            vm.triggerRecompute()
         }
     }
 
@@ -58,21 +69,18 @@ struct BrnoView: View {
 
     private var mapLayer: some View {
         Map(position: $vm.camera) {
-            // Show pins when a filter chip is active OR when navigating
-            if !vm.effectiveFilters.isEmpty {
-                ForEach(vm.filteredStations(allStations)) { st in
-                    Annotation(st.ulice, coordinate: st.coordinate) {
-                        PieChart(
-                            station: st,
-                            activeFilters: vm.effectiveFilters,
-                            isSelected: vm.selectedStation?.id == st.id,
-                            spanDelta: vm.mapRegion.span.latitudeDelta
-                        )
-                        .onTapGesture {
-                            withAnimation(.spring()) {
-                                isSearchFocused = false
-                                vm.selectStation(st)
-                            }
+            ForEach(vm.visibleStations) { st in
+                Annotation(st.ulice, coordinate: st.coordinate) {
+                    PieChart(
+                        station: st,
+                        activeFilters: vm.effectiveFilters,
+                        isSelected: vm.selectedStation?.id == st.id,
+                        spanDelta: vm.mapRegion.span.latitudeDelta
+                    )
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            isSearchFocused = false
+                            vm.selectStation(st)
                         }
                     }
                 }
@@ -93,12 +101,11 @@ struct BrnoView: View {
                     .stroke(.red, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             }
 
-            // Always show the blue GPS dot
             UserAnnotation()
         }
         .mapStyle(.standard)
         .onMapCameraChange { context in
-            vm.mapRegion = context.region
+            vm.onRegionChanged(context.region)
         }
         .ignoresSafeArea()
         .sheet(item: $vm.selectedStation) { station in
@@ -167,15 +174,15 @@ struct BrnoView: View {
     private var floatingButtons: some View {
         VStack {
             Spacer()
-
             HStack {
                 Spacer()
                 VStack(spacing: 16) {
-                    // Stop navigation — small x button, only shown when navigating
+                    // Stop navigation X button
                     if vm.isNavigating {
                         Button {
                             withAnimation(.spring(response: 0.35)) {
                                 vm.stopNavigation()
+                                streetQuery = ""
                             }
                         } label: {
                             Image(systemName: "xmark")
@@ -206,11 +213,15 @@ struct BrnoView: View {
                     }
                     .scaleEffect(vm.showNavigationPanel ? 0.95 : 1.0)
 
-                    // Location arrow
+                    // Location arrow — clears search point, centers on user/Brno
                     Button {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                             vm.isTracking.toggle()
                         }
+                        // Clear search origin — use real location again
+                        vm.clearSearchPoint()
+                        streetQuery = ""
+
                         let coord = locationManager.isInBrno
                             ? locationManager.effectiveLocation.coordinate
                             : LocationManager.defaultBrnoCoordinate

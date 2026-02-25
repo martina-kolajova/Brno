@@ -19,7 +19,7 @@ struct WelcomeView: View {
         ZStack {
             Color.white.ignoresSafeArea()
             
-            VStack(spacing: 60) {
+            VStack(spacing: 70) {
                 Image(systemName: "trash")
                     .font(.system(size: 60, weight: .medium))
                     .foregroundStyle(dropped ? .red : .black)
