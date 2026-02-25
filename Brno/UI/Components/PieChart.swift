@@ -45,7 +45,7 @@ struct PieChart: View {
 
                 Circle()
                     .fill(.white)
-                    .frame(width: pinSize * 0.32, height: pinSize * 0.32)
+                    .frame(width: pinSize * 0.42, height: pinSize * 0.42)
 
             } else {
                 // Default: small red dot
