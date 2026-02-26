@@ -18,51 +18,27 @@ struct BrnoView: View {
         ZStack(alignment: .bottom) {
             mapLayer
             controlsLayer
-            floatingButtons
 
-            // Quick nav sheet
-            if vm.showNavigationPanel {
-                Color.black.opacity(0.25)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.35)) {
-                            vm.showNavigationPanel = false
-                        }
-                    }
+            FloatingButtons(
+                vm: vm,
+                isInBrno: locationManager.isInBrno,
+                effectiveLocation: locationManager.effectiveLocation,
+                onClearSearch: { streetQuery = "" }
+            )
 
-                QuickNavButtons(
-                    onSelect: { filter in
-                        withAnimation(.spring(response: 0.35)) {
-                            vm.showNavigationPanel = false
-                        }
-                        vm.startQuickNavigation(for: filter, in: allStations, userLocation: locationManager.effectiveLocation)
-                    },
-                    onDismiss: {
-                        withAnimation(.spring(response: 0.35)) {
-                            vm.showNavigationPanel = false
-                        }
-                    }
-                )
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .zIndex(20)
-            }
+            QuickNavOverlay(
+                vm: vm,
+                allStations: allStations,
+                userLocation: locationManager.effectiveLocation
+            )
         }
         .animation(.spring(response: 0.35), value: vm.showNavigationPanel)
-        .onAppear {
-            vm.setAllStations(allStations)
-        }
+        .onAppear { vm.setAllStations(allStations) }
         .onChange(of: streetQuery) { _, newValue in
-            if isSearchFocused {
-                searchCompleter.update(query: newValue)
-            }
-            // Clear search point when user deletes the street text
-            if newValue.isEmpty {
-                vm.clearSearchPoint()
-            }
+            if isSearchFocused { searchCompleter.update(query: newValue) }
+            if newValue.isEmpty { vm.clearSearchPoint() }
         }
-        .onChange(of: vm.selectedFilters) {
-            vm.triggerRecompute()
-        }
+        .onChange(of: vm.selectedFilters) { vm.triggerRecompute() }
     }
 
     // MARK: - Map
@@ -104,9 +80,7 @@ struct BrnoView: View {
             UserAnnotation()
         }
         .mapStyle(.standard)
-        .onMapCameraChange { context in
-            vm.onRegionChanged(context.region)
-        }
+        .onMapCameraChange { context in vm.onRegionChanged(context.region) }
         .ignoresSafeArea()
         .sheet(item: $vm.selectedStation) { station in
             DetailStationPanel(
@@ -123,7 +97,7 @@ struct BrnoView: View {
         }
     }
 
-    // MARK: - Top controls
+    // MARK: - Top Controls
 
     private var controlsLayer: some View {
         VStack(spacing: 0) {
@@ -132,123 +106,14 @@ struct BrnoView: View {
                 .padding(.top, 10)
 
             if isSearchFocused && !searchCompleter.results.isEmpty {
-                searchSuggestions
+                SearchSuggestions(results: searchCompleter.results) { result, title in
+                    vm.selectAddress(result)
+                    streetQuery = title
+                    isSearchFocused = false
+                }
             }
 
             Spacer()
         }
-    }
-
-    // MARK: - Search suggestions
-
-    private var searchSuggestions: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(searchCompleter.results, id: \.self) { result in
-                    Button {
-                        vm.selectAddress(result)
-                        streetQuery = result.title
-                        isSearchFocused = false
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(result.title).foregroundStyle(.red)
-                            Text(result.subtitle).font(.caption).foregroundStyle(.secondary)
-                        }
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    Divider().padding(.horizontal, 16)
-                }
-            }
-        }
-        .background(Color(.systemBackground))
-        .cornerRadius(15)
-        .shadow(radius: 5)
-        .padding(.horizontal, 20)
-        .padding(.top, 5)
-        .frame(maxHeight: 200)
-    }
-
-    // MARK: - Floating action buttons
-
-    private var floatingButtons: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                VStack(spacing: 16) {
-                    // Stop navigation X button
-                    if vm.isNavigating {
-                        Button {
-                            withAnimation(.spring(response: 0.35)) {
-                                vm.stopNavigation()
-                                streetQuery = ""
-                            }
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(.white)
-                                .frame(width: 36, height: 36)
-                                .background(Circle().fill(Color.red))
-                                .shadow(color: .black.opacity(0.15), radius: 4)
-                        }
-                        .transition(.scale.combined(with: .opacity))
-                    }
-
-                    // Trash / find nearest
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            vm.showNavigationPanel.toggle()
-                        }
-                    } label: {
-                        Image(systemName: "trash.fill")
-                            .foregroundStyle(vm.showNavigationPanel ? .red : .white)
-                            .font(.system(size: 18, weight: .semibold))
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(vm.showNavigationPanel ? .white : .red)
-                                    .shadow(color: .black.opacity(0.15), radius: 4)
-                            )
-                    }
-                    .scaleEffect(vm.showNavigationPanel ? 0.95 : 1.0)
-
-                    // Location arrow — clears search point, centers on user/Brno
-                    Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            vm.isTracking.toggle()
-                        }
-                        // Clear search origin — use real location again
-                        vm.clearSearchPoint()
-                        streetQuery = ""
-
-                        let coord = locationManager.isInBrno
-                            ? locationManager.effectiveLocation.coordinate
-                            : LocationManager.defaultBrnoCoordinate
-                        withAnimation(.spring()) {
-                            vm.camera = .region(MKCoordinateRegion(
-                                center: coord,
-                                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                            ))
-                        }
-                    } label: {
-                        Image(systemName: "location.fill")
-                            .foregroundStyle(vm.isTracking ? .red : .white)
-                            .font(.system(size: 18, weight: .semibold))
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(vm.isTracking ? .white : .red)
-                                    .shadow(color: .black.opacity(0.15), radius: 4)
-                            )
-                    }
-                    .scaleEffect(vm.isTracking ? 0.95 : 1.0)
-                }
-                .padding(.trailing, 20)
-                .padding(.bottom, vm.selectedStation == nil ? 40 : 320)
-            }
-        }
-        .animation(.spring(response: 0.35), value: vm.isNavigating)
-        .zIndex(10)
     }
 }

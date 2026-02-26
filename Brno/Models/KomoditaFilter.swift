@@ -18,6 +18,9 @@ enum KomoditaFilter: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// Same as rawValue — kept for readability in views.
+    var displayName: String { rawValue }
+
     var color: Color {
         switch self {
         case .papir: return .blue
@@ -25,16 +28,6 @@ enum KomoditaFilter: String, CaseIterable, Identifiable {
         case .bio: return .brown
         case .sklo: return .green
         case .textil: return .purple
-        }
-    }
-
-    var displayName: String {
-        switch self {
-        case .papir: return "Papír"
-        case .plast: return "Plast"
-        case .bio: return "Bio"
-        case .sklo: return "Sklo"
-        case .textil: return "Textil"
         }
     }
 

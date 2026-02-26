@@ -45,7 +45,7 @@ final class BrnoMapViewModel: ObservableObject {
     // MARK: - Visible stations (pre-filtered, capped, background-computed)
 
     @Published var visibleStations: [KontejnerStation] = []
-    private let maxAnnotations = 200
+    private let maxAnnotations = 200 
     private var allStationsCache: [KontejnerStation] = []
     private var filterTask: Task<Void, Never>?
     private var regionSubject = PassthroughSubject<Void, Never>()
@@ -54,7 +54,7 @@ final class BrnoMapViewModel: ObservableObject {
     init() {
         // Debounce region/filter changes — recompute after 250ms of no changes
         regionSubject
-            .debounce(for: .milliseconds(250), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.recomputeVisibleStations() }
             .store(in: &cancellables)
     }
@@ -107,7 +107,6 @@ final class BrnoMapViewModel: ObservableObject {
             let maxLon = region.center.longitude + region.span.longitudeDelta / 2
 
             let result = stations.filter { st in
-                guard !Task.isCancelled else { return false }
                 let lat = st.coordinate.latitude
                 let lon = st.coordinate.longitude
                 let inBounds = lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon
@@ -118,6 +117,7 @@ final class BrnoMapViewModel: ObservableObject {
             // 2. Cap to prevent UI overload
             let capped = result.count > cap ? Array(result.prefix(cap)) : result
 
+            // Only check cancellation before writing — never mid-filter
             guard !Task.isCancelled else { return }
 
             await MainActor.run {
@@ -213,6 +213,7 @@ final class BrnoMapViewModel: ObservableObject {
 
                 withAnimation(.spring()) {
                     self.route = computedRoute
+                    self.isNavigating = true
 
                     let dist = computedRoute.distance
                     self.routeDistance = dist < 1000

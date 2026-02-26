@@ -74,11 +74,11 @@ struct DetailStationPanel: View {
                 .background(Capsule().fill(Color(.systemGray6)))
             }
 
-            Button(action: onClose) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(.secondary.opacity(0.6))
-            }
+//            Button(action: onClose) {
+//                Image(systemName: "xmark.circle.fill")
+//                    .font(.title3)
+//                    .foregroundStyle(.secondary.opacity(0.6))
+//            }
         }
     }
 
@@ -98,13 +98,13 @@ struct DetailStationPanel: View {
             }
             .padding(.vertical, 6)
         }
-        // ✅ nepřidávej žádné gesture tady
+      
     }
     
 
     private var bottomCTA: some View {
         Button(action: onNavigate) {
-            Text("Navigovat k cíli")
+            Text("Navigovat ke košu")
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)

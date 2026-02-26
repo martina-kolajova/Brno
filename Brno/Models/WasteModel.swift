@@ -1,23 +1,18 @@
-//
-//  WasteKind.swift
-//  Brno
-//
-//  Created by Martina Kolajová on 06.02.2026.
-//
-
-
 import Foundation
 import SwiftUI
 
+// MARK: - Waste Kind
 
 enum WasteKind: String, CaseIterable, Hashable, Identifiable {
     case papir, plast, sklo, bioodpad, textil
-    
+
     var id: String { self.rawValue }
 }
 
+// MARK: - JSON Data Lookup
+
 extension WasteKind {
-    // Definujeme strukturu přesně podle tvého JSONu
+
     private struct WasteDataEntry: Codable {
         let id: String
         let title: String
@@ -28,7 +23,7 @@ extension WasteKind {
         let education: String
     }
 
-    // Pomocná funkce pro načtení konkrétního řádku z JSONu
+    /// Loads the matching entry from WasteData.json.
     private var jsonData: WasteDataEntry? {
         guard let url = Bundle.main.url(forResource: "WasteData", withExtension: "json"),
               let data = try? Data(contentsOf: url),
@@ -38,25 +33,24 @@ extension WasteKind {
         return entries.first(where: { $0.id == self.rawValue })
     }
 
-    // Všechny vlastnosti teď taháme z JSONu
     var title: String {
         jsonData?.title ?? self.rawValue.capitalized
     }
-    
+
     var titleShortUpper: String {
         jsonData?.titleShortUpper ?? self.rawValue.uppercased()
     }
-    
+
     var hint: String {
-        jsonData?.hint ?? "Informace o tom, co sem patří, chybí."
+        jsonData?.hint ?? "No hint available."
     }
 
     var warning: String {
-        jsonData?.warning ?? "Informace o nevhodném odpadu nejsou dostupné."
+        jsonData?.warning ?? "No warning available."
     }
 
     var education: String {
-        jsonData?.education ?? "Recyklace šetří naše životní prostředí."
+        jsonData?.education ?? "Recycling helps the environment."
     }
 
     var color: Color {
@@ -66,6 +60,8 @@ extension WasteKind {
         return .gray
     }
 }
+
+// MARK: - Color Hex Extension
 
 extension Color {
     init(hex: String) {
