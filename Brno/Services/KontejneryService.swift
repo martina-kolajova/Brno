@@ -110,14 +110,13 @@ final class KontejneryService: KontejneryServicing {
 
 private extension KontejneryService {
 
+    /// Groups containers into stations using stanoviste_ogc_fid (official dataset key).
     func buildResult(from features: [GeoJSONFeature]) -> (stats: KontejnerStats, stations: [KontejnerStation]) {
         var byKind: [WasteKind: Int] = [:]
         var stationIDs = Set<String>()
 
         struct GroupAccumulator {
-            var title: String
-            var ulice: String
-            var cp: String?
+            var nazev: String
             var komodity: Set<String>
             var coordinate: CLLocationCoordinate2D
         }
@@ -147,19 +146,17 @@ private extension KontejneryService {
                 }
             }
 
-            // Group features into stations
+            // Group features into stations by stanoviste_ogc_fid
             guard let sid = props.stanovisteOGCFID,
                   let (lon, lat) = feature.geometry.pointCoordinates else { continue }
 
-            let ulice = props.ulice?.trimmedOrNil ?? "—"
-            let cp = props.cp?.trimmedOrNil
-            let title = props.nazev?.trimmedOrNil ?? "\(ulice) \(cp ?? "")"
+            let nazev = props.nazev?.trimmedOrNil ?? "—"
             let coord = CLLocationCoordinate2D(latitude: lat, longitude: lon)
 
             if grouped[sid] == nil {
                 var kinds = Set<String>()
                 if let k = props.komodita?.trimmedOrNil { kinds.insert(k) }
-                grouped[sid] = GroupAccumulator(title: title, ulice: ulice, cp: cp, komodity: kinds, coordinate: coord)
+                grouped[sid] = GroupAccumulator(nazev: nazev, komodity: kinds, coordinate: coord)
             } else if let k = props.komodita?.trimmedOrNil {
                 grouped[sid]?.komodity.insert(k)
             }
@@ -174,13 +171,12 @@ private extension KontejneryService {
         let stations = grouped.map { (sid, acc) in
             KontejnerStation(
                 id: sid,
-                title: acc.title,
-                ulice: acc.ulice,
-                cp: acc.cp,
+                nazev: acc.nazev,
                 komodity: acc.komodity.sorted(),
                 coordinate: acc.coordinate
             )
         }
+    
 
         return (stats, stations)
     }

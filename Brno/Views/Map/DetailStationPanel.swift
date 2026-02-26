@@ -54,7 +54,7 @@ struct DetailStationPanel: View {
     private var header: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(station.ulice)
+                Text(station.nazev)
                     .font(.system(size: 22, weight: .bold))
                 Text("Brno, Česká republika")
                     .font(.subheadline)

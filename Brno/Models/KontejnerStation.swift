@@ -5,9 +5,7 @@ import CoreLocation
 
 struct KontejnerStation: Identifiable {
     let id: String
-    let title: String
-    let ulice: String
-    let cp: String?
+    let nazev: String
     let komodity: [String]
     let coordinate: CLLocationCoordinate2D
 }

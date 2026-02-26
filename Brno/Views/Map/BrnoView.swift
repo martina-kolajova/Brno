@@ -46,7 +46,7 @@ struct BrnoView: View {
     private var mapLayer: some View {
         Map(position: $vm.camera) {
             ForEach(vm.visibleStations) { st in
-                Annotation(st.ulice, coordinate: st.coordinate) {
+                Annotation(st.nazev, coordinate: st.coordinate) {
                     PieChart(
                         station: st,
                         activeFilters: vm.effectiveFilters,
