@@ -1,7 +1,17 @@
+//
+//  ButtonStyles.swift
+//  Brno
+//
+//  Custom button styles used across the app.
+//
+
 import SwiftUI
 
 // MARK: - FAB Button Style
 
+/// Circular floating action button style with active/inactive states.
+/// Active: white background with colored border and icon.
+/// Inactive: colored background with white icon.
 struct FABButtonStyle: ButtonStyle {
     var color: Color = .red
     var isActive: Bool = false
@@ -24,5 +34,3 @@ struct FABButtonStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
     }
 }
-
-typealias MagneticButtonStyle = FABButtonStyle

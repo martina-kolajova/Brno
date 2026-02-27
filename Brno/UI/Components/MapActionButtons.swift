@@ -1,9 +1,19 @@
+//
+//  MapActionButtons.swift
+//  Brno
+//
+//  Floating action buttons for the map screen.
+//  Stop navigation (X), find nearest (trash), and locate me (arrow).
+//
+
 import SwiftUI
 import CoreLocation
 import MapKit
-// MARK: - Floating Action Buttons
 
-struct FloatingButtons: View {
+// MARK: - Map Action Buttons
+
+/// Floating action buttons (FABs) displayed on the bottom-right of the map.
+struct MapActionButtons: View {
     @ObservedObject var vm: BrnoMapViewModel
     let isInBrno: Bool
     let effectiveLocation: CLLocation
@@ -12,10 +22,10 @@ struct FloatingButtons: View {
     private var bottomPadding: CGFloat {
         guard vm.selectedStation != nil else { return 40 }
         switch vm.detent {
-        case .height(70):   return 90
+        case .height(70):     return 90
         case .fraction(0.37): return 320
-        case .large:         return 680
-        default:             return 320
+        case .large:          return 680
+        default:              return 320
         }
     }
 
@@ -61,7 +71,7 @@ struct FloatingButtons: View {
         }
     }
 
-    // MARK: - Trash / Find Nearest
+    // MARK: - Find Nearest (Trash)
 
     private var trashButton: some View {
         Button {
@@ -82,7 +92,7 @@ struct FloatingButtons: View {
         .scaleEffect(vm.showNavigationPanel ? 0.95 : 1.0)
     }
 
-    // MARK: - Location Arrow
+    // MARK: - Locate Me
 
     private var locationButton: some View {
         Button {

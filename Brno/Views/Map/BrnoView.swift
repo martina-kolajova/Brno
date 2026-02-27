@@ -19,14 +19,14 @@ struct BrnoView: View {
             mapLayer
             controlsLayer
 
-            FloatingButtons(
+            MapActionButtons(
                 vm: vm,
                 isInBrno: locationManager.isInBrno,
                 effectiveLocation: locationManager.effectiveLocation,
                 onClearSearch: { streetQuery = "" }
             )
 
-            QuickNavOverlay(
+            QuickNavPanel(
                 vm: vm,
                 allStations: allStations,
                 userLocation: locationManager.effectiveLocation
@@ -47,7 +47,7 @@ struct BrnoView: View {
         Map(position: $vm.camera) {
             ForEach(vm.visibleStations) { st in
                 Annotation(st.nazev, coordinate: st.coordinate) {
-                    PieChart(
+                    StationPin(
                         station: st,
                         activeFilters: vm.effectiveFilters,
                         isSelected: vm.selectedStation?.id == st.id,

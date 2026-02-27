@@ -1,11 +1,17 @@
 //
-//  OrlojStatsView.swift
+//  WasteStatsChart.swift
 //  Brno
 //
-//  Created by Martina Kolajová on 06.02.2026.
+//  Orloj-style waste statistics chart for the Info screen.
+//  Displays waste categories in a custom curved shape with horizontal dividers.
+//  Contains: WasteStatsChart, OrlojShape (private), OrlojInnerLines (private).
+//
+
 import SwiftUI
 
+// MARK: - Waste Stats Chart
 
+/// Orloj-inspired chart showing waste category names as tappable rows.
 struct WasteStatsChart: View {
     let stats: KontejnerStats?
     let showNumbers: Bool
@@ -35,7 +41,6 @@ struct WasteStatsChart: View {
                         let midY = (yCuts[i] + yCuts[i+1]) / 2 * h
                         
                         Button(action: { onSelect(order[i]) }) {
-                            // TADY JSME NECHALI JEN NÁZEV (PAPÍR, PLAST...)
                             Text(order[i].titleShortUpper)
                                 .font(.system(size: 16, weight: .black))
                                 .foregroundStyle(.black)
@@ -52,8 +57,9 @@ struct WasteStatsChart: View {
     }
 }
 
+// MARK: - Helper Shapes
 
-// MARK: - POMOCNÉ TVARY
+/// Custom curved outline shape inspired by the Prague Orloj clock.
 private struct OrlojShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -70,6 +76,7 @@ private struct OrlojShape: Shape {
     }
 }
 
+/// Horizontal divider lines inside the Orloj shape.
 private struct OrlojInnerLines: View {
     let yCuts: [CGFloat]
     let red: Color

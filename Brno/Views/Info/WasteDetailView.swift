@@ -9,7 +9,7 @@
 import SwiftUI
 
 
-struct OdpadDetailView: View {
+struct WasteDetailView: View {
     let kind: WasteKind
     let count: Int
     @Environment(\.dismiss) var dismiss

@@ -62,7 +62,7 @@ struct InfoView: View {
         }
         // V InfoView.swift najdi tuto část:
         .sheet(item: $viewModel.selectedCategory) { kind in
-            OdpadDetailView(
+            WasteDetailView(
                 kind: kind,
                 count: stats?.byKind[kind] ?? 0
             )
