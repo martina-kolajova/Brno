@@ -4,7 +4,7 @@ import CoreLocation
 // MARK: - Service Protocol
 
 protocol KontejneryServicing {
-    func fetchAllData() async throws -> (stats: KontejnerStats, stations: [KontejnerStation])
+    func fetchAllData() async throws -> (stats: WasteStatistics, stations: [WasteStation])
 }
 
 // MARK: - API Service
@@ -24,11 +24,11 @@ final class KontejneryService: KontejneryServicing {
     }()
 
     /// Fetches ALL container data using paginated requests, then computes stats + grouped stations.
-    func fetchAllData() async throws -> (stats: KontejnerStats, stations: [KontejnerStation]) {
+    func fetchAllData() async throws -> (stats: WasteStatistics, stations: [WasteStation]) {
 
         // 1. Get total count (tiny request, no geometry)
         let total = try await fetchTotalCount()
-        guard total > 0 else { return (KontejnerStats(totalContainers: 0, totalStations: 0, byKind: [:]), []) }
+        guard total > 0 else { return (WasteStatistics(totalContainers: 0, totalStations: 0, byKind: [:]), []) }
 
         // 2. Fetch all pages concurrently
         let pageCount = Int(ceil(Double(total) / Double(pageSize)))
@@ -111,7 +111,7 @@ final class KontejneryService: KontejneryServicing {
 private extension KontejneryService {
 
     /// Groups containers into stations using stanoviste_ogc_fid (official dataset key).
-    func buildResult(from features: [GeoJSONFeature]) -> (stats: KontejnerStats, stations: [KontejnerStation]) {
+    func buildResult(from features: [GeoJSONFeature]) -> (stats: WasteStatistics, stations: [WasteStation]) {
         var byKind: [WasteKind: Int] = [:]
         var stationIDs = Set<String>()
 
@@ -162,14 +162,14 @@ private extension KontejneryService {
             }
         }
 
-        let stats = KontejnerStats(
+        let stats = WasteStatistics(
             totalContainers: features.count,
             totalStations: stationIDs.count,
             byKind: byKind
         )
 
         let stations = grouped.map { (sid, acc) in
-            KontejnerStation(
+            WasteStation(
                 id: sid,
                 nazev: acc.nazev,
                 komodity: acc.komodity.sorted(),

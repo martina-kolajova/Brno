@@ -1,5 +1,5 @@
 //
-//  KomoditaFilter.swift
+//  WasteFilter.swift
 //  Brno
 //
 //  Created by Martina Kolajová on 01.02.2026.
@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Waste Category Filter
 
-enum KomoditaFilter: String, CaseIterable, Identifiable {
+enum WasteFilter: String, CaseIterable, Identifiable {
     case papir = "Papír"
     case plast = "Plast"
     case bio = "Bio"

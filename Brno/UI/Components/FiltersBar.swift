@@ -13,7 +13,7 @@ import MapKit
 
 /// Top search bar with expandable filter chips and street search autocomplete.
 struct FiltersBar: View {
-    @Binding var selected: Set<KomoditaFilter>
+    @Binding var selected: Set<WasteFilter>
     @Binding var streetQuery: String
     @State private var showFilters: Bool = false
 
@@ -85,7 +85,7 @@ struct FiltersBar: View {
         if showFilters {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(KomoditaFilter.allCases) { filter in
+                    ForEach(WasteFilter.allCases) { filter in
                         FilterChip(
                             filter: filter,
                             isSelected: selected.contains(filter),
@@ -116,7 +116,7 @@ struct FiltersBar: View {
 
 /// Single filter chip button — shows waste type icon and name.
 private struct FilterChip: View {
-    let filter: KomoditaFilter
+    let filter: WasteFilter
     let isSelected: Bool
     let action: () -> Void
 

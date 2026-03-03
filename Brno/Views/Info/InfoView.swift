@@ -10,7 +10,7 @@ import SwiftUI
 
 struct InfoView: View {
     @StateObject private var viewModel = InfoViewModel()
-    var stats: KontejnerStats?
+    var stats: WasteStatistics?
     var onContinue: () -> Void
 
     var body: some View {

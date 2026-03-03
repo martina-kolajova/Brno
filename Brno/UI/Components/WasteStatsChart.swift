@@ -13,7 +13,7 @@ import SwiftUI
 
 /// Orloj-inspired chart showing waste category names as tappable rows.
 struct WasteStatsChart: View {
-    let stats: KontejnerStats?
+    let stats: WasteStatistics?
     let showNumbers: Bool
     var onSelect: (WasteKind) -> Void
     

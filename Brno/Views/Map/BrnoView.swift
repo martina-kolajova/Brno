@@ -5,7 +5,7 @@ import CoreLocation
 // MARK: - Map View
 
 struct BrnoView: View {
-    let allStations: [KontejnerStation]
+    let allStations: [WasteStation]
 
     @StateObject private var vm = BrnoMapViewModel()
     @StateObject private var locationManager = LocationManager()
@@ -46,7 +46,7 @@ struct BrnoView: View {
     private var mapLayer: some View {
         Map(position: $vm.camera) {
             ForEach(vm.visibleStations) { st in
-                Annotation(st.nazev, coordinate: st.coordinate) {
+                Annotation("", coordinate: st.coordinate) {
                     StationPin(
                         station: st,
                         activeFilters: vm.effectiveFilters,

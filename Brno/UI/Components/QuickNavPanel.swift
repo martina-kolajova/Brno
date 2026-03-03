@@ -1,9 +1,9 @@
-//
+//<
 //  QuickNavPanel.swift
 //  Brno
 //
 //  "Find nearest container" bottom sheet with overlay dimming.
-//  Contains: QuickNavPanel (overlay + dismiss) and QuickNavButtons (grid of waste types).
+//  Contains: QuickNavPanel (overlay + dismiss) and QuickNavButtons (horizontal selector).
 //
 
 import SwiftUI
@@ -14,12 +14,12 @@ import CoreLocation
 /// Full-screen overlay with a bottom sheet for selecting the nearest waste container type.
 struct QuickNavPanel: View {
     @ObservedObject var vm: BrnoMapViewModel
-    let allStations: [KontejnerStation]
+    let allStations: [WasteStation]
     let userLocation: CLLocation
 
     var body: some View {
         if vm.showNavigationPanel {
-            Color.black.opacity(0.25)
+            Color.black.opacity(0.2)
                 .ignoresSafeArea()
                 .onTapGesture { dismiss() }
 
@@ -42,84 +42,80 @@ struct QuickNavPanel: View {
     }
 }
 
-// MARK: - Quick Nav Buttons Grid
+// MARK: - Quick Nav Buttons
 
-/// Compact grid of waste type buttons — tap one to navigate to the nearest container.
+/// Modern horizontal selector — tap a waste type to navigate to the nearest container.
 private struct QuickNavButtons: View {
-    var onSelect: (KomoditaFilter) -> Void
+    var onSelect: (WasteFilter) -> Void
     var onDismiss: () -> Void
 
-    @State private var selected: KomoditaFilter? = nil
+    @State private var selected: WasteFilter? = nil
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            buttonGrid
-            Color.clear.frame(height: 2)
-        }
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: .black.opacity(0.08), radius: 6, y: -1)
-        .frame(maxHeight: 180)
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 12) {
+            // Drag indicator
             Capsule()
                 .fill(Color(.systemGray4))
-                .frame(width: 24, height: 3)
-                .padding(.top, 6)
+                .frame(width: 36, height: 4)
 
+            // Header
             HStack {
-                Text("Kam s tým?")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.red)
+                Text("Co vyhazuješ?")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.primary)
                 Spacer()
                 Button(action: onDismiss) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundColor(Color(.systemGray3))
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28, height: 28)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.bottom, 2)
-        }
-    }
 
-    // MARK: - Button Grid
+            // Waste type buttons — horizontal row
+            HStack(spacing: 10) {
+                ForEach(WasteFilter.allCases) { filter in
+                    let isActive = selected == filter
 
-    private var buttonGrid: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                ForEach(KomoditaFilter.allCases) { filter in
                     Button {
-                        selected = filter
-                        onSelect(filter)
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            selected = filter
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            onSelect(filter)
+                        }
                     } label: {
-                        VStack(spacing: 4) {
-                            Circle()
-                                .fill(selected == filter ? Color.red : filter.color.opacity(0.18))
-                                .frame(width: 28, height: 28)
-                                .overlay(
-                                    Image(systemName: filter.iconName)
-                                        .font(.system(size: 13, weight: .semibold))
-                                        .foregroundColor(selected == filter ? .white : filter.color)
-                                )
+                        VStack(spacing: 6) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(isActive ? filter.color : Color(.systemGray6))
+                                    .frame(width: 48, height: 48)
+
+                                Image(systemName: filter.iconName)
+                                    .font(.system(size: 18, weight: .medium))
+                                    .foregroundStyle(isActive ? .white : filter.color)
+                            }
+                            .scaleEffect(isActive ? 1.08 : 1.0)
+
                             Text(filter.displayName)
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundColor(selected == filter ? .red : .primary)
+                                .font(.system(size: 10, weight: isActive ? .bold : .medium))
+                                .foregroundStyle(isActive ? filter.color : .secondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 6)
-            .padding(.vertical, 6)
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+        )
     }
 }

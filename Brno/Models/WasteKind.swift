@@ -23,9 +23,9 @@ extension WasteKind {
         let education: String
     }
 
-    /// Loads the matching entry from WasteData.json.
+    /// Loads the matching entry from WasteKindData.json.
     private var jsonData: WasteDataEntry? {
-        guard let url = Bundle.main.url(forResource: "WasteData", withExtension: "json"),
+        guard let url = Bundle.main.url(forResource: "WasteKindData", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let entries = try? JSONDecoder().decode([WasteDataEntry].self, from: data) else {
             return nil

@@ -5,13 +5,13 @@ import CoreLocation
 // MARK: - Mock API Service
 
 struct MockKontejneryService: KontejneryServicing {
-    var result: (stats: KontejnerStats, stations: [KontejnerStation]) = (
-        KontejnerStats(totalContainers: 0, totalStations: 0, byKind: [:]),
+    var result: (stats: WasteStatistics, stations: [WasteStation]) = (
+        WasteStatistics(totalContainers: 0, totalStations: 0, byKind: [:]),
         []
     )
     var shouldFail = false
 
-    func fetchAllData() async throws -> (stats: KontejnerStats, stations: [KontejnerStation]) {
+    func fetchAllData() async throws -> (stats: WasteStatistics, stations: [WasteStation]) {
         if shouldFail { throw ServiceError.httpError(statusCode: 500) }
         return result
     }
@@ -19,7 +19,7 @@ struct MockKontejneryService: KontejneryServicing {
 
 // MARK: - Test Helpers
 
-extension KontejnerStation {
+extension WasteStation {
     static func mock(
         id: String = "1",
         title: String = "Test Station",
@@ -28,8 +28,8 @@ extension KontejnerStation {
         komodity: [String] = ["Papír", "Plast"],
         lat: Double = 49.1951,
         lon: Double = 16.6068
-    ) -> KontejnerStation {
-        KontejnerStation(
+    ) -> WasteStation {
+        WasteStation(
             id: id,
             title: title,
             ulice: ulice,
@@ -42,27 +42,27 @@ extension KontejnerStation {
 
 // MARK: - Station Matching Tests
 
-final class KontejnerStationTests: XCTestCase {
+final class WasteStationTests: XCTestCase {
 
     func testMatchesPapir() {
-        let station = KontejnerStation.mock(komodity: ["Papír"])
+        let station = WasteStation.mock(komodity: ["Papír"])
         XCTAssertTrue(station.matches(.papir))
     }
 
     func testMatchesPlast() {
-        let station = KontejnerStation.mock(komodity: ["Plast"])
+        let station = WasteStation.mock(komodity: ["Plast"])
         XCTAssertTrue(station.matches(.plast))
     }
 
     func testDoesNotMatchWrongFilter() {
-        let station = KontejnerStation.mock(komodity: ["Papír"])
+        let station = WasteStation.mock(komodity: ["Papír"])
         XCTAssertFalse(station.matches(.sklo))
         XCTAssertFalse(station.matches(.bio))
         XCTAssertFalse(station.matches(.textil))
     }
 
     func testMatchesMultipleKomodity() {
-        let station = KontejnerStation.mock(komodity: ["Papír", "Sklo", "Textil"])
+        let station = WasteStation.mock(komodity: ["Papír", "Sklo", "Textil"])
         XCTAssertTrue(station.matches(.papir))
         XCTAssertTrue(station.matches(.sklo))
         XCTAssertTrue(station.matches(.textil))
@@ -70,18 +70,18 @@ final class KontejnerStationTests: XCTestCase {
     }
 
     func testDominantFilter() {
-        let station = KontejnerStation.mock(komodity: ["Sklo"])
+        let station = WasteStation.mock(komodity: ["Sklo"])
         XCTAssertEqual(station.dominantFilter(), .sklo)
     }
 
     func testDominantFilterReturnsFirstMatch() {
-        let station = KontejnerStation.mock(komodity: ["Papír", "Plast"])
+        let station = WasteStation.mock(komodity: ["Papír", "Plast"])
         XCTAssertEqual(station.dominantFilter(), .papir)
     }
 
     func testEmptyKomodityMatchesNothing() {
-        let station = KontejnerStation.mock(komodity: [])
-        for filter in KomoditaFilter.allCases {
+        let station = WasteStation.mock(komodity: [])
+        for filter in WasteFilter.allCases {
             XCTAssertFalse(station.matches(filter))
         }
         XCTAssertNil(station.dominantFilter())
@@ -94,8 +94,8 @@ final class KontejnerStationTests: XCTestCase {
 final class AppViewModelTests: XCTestCase {
 
     func testLoadDataSuccess() async {
-        let mockStats = KontejnerStats(totalContainers: 10, totalStations: 3, byKind: [.papir: 5, .sklo: 5])
-        let mockStations = [KontejnerStation.mock(id: "1"), KontejnerStation.mock(id: "2")]
+        let mockStats = WasteStatistics(totalContainers: 10, totalStations: 3, byKind: [.papir: 5, .sklo: 5])
+        let mockStations = [WasteStation.mock(id: "1"), WasteStation.mock(id: "2")]
         let service = MockKontejneryService(result: (mockStats, mockStations))
 
         let vm = AppViewModel(service: service)
@@ -161,7 +161,7 @@ final class BrnoMapViewModelTests: XCTestCase {
 
     func testSelectStation() {
         let vm = BrnoMapViewModel()
-        let station = KontejnerStation.mock()
+        let station = WasteStation.mock()
 
         vm.selectStation(station)
 
@@ -171,7 +171,7 @@ final class BrnoMapViewModelTests: XCTestCase {
 
     func testClearStation() {
         let vm = BrnoMapViewModel()
-        vm.selectedStation = KontejnerStation.mock()
+        vm.selectedStation = WasteStation.mock()
         vm.routeDistance = "500 m"
         vm.routeTravelTime = "6 min"
 
@@ -185,7 +185,7 @@ final class BrnoMapViewModelTests: XCTestCase {
 
     func testStopNavigationResetsAll() {
         let vm = BrnoMapViewModel()
-        vm.selectedStation = KontejnerStation.mock()
+        vm.selectedStation = WasteStation.mock()
         vm.isNavigating = true
         vm.activeNavFilter = .papir
         vm.activeSearchPoint = CLLocationCoordinate2D(latitude: 49.2, longitude: 16.6)
@@ -209,45 +209,45 @@ final class BrnoMapViewModelTests: XCTestCase {
     }
 }
 
-// MARK: - KomoditaFilter Tests
+// MARK: - WasteFilter Tests
 
-final class KomoditaFilterTests: XCTestCase {
+final class WasteFilterTests: XCTestCase {
 
     func testAllCasesCount() {
-        XCTAssertEqual(KomoditaFilter.allCases.count, 5)
+        XCTAssertEqual(WasteFilter.allCases.count, 5)
     }
 
     func testDisplayNameMatchesRawValue() {
-        for filter in KomoditaFilter.allCases {
+        for filter in WasteFilter.allCases {
             XCTAssertEqual(filter.displayName, filter.rawValue)
         }
     }
 
     func testEachFilterHasIcon() {
-        for filter in KomoditaFilter.allCases {
+        for filter in WasteFilter.allCases {
             XCTAssertFalse(filter.iconName.isEmpty)
         }
     }
 
     func testEachFilterHasUniqueColor() {
-        let colors = KomoditaFilter.allCases.map { "\($0.color)" }
+        let colors = WasteFilter.allCases.map { "\($0.color)" }
         XCTAssertEqual(colors.count, Set(colors).count, "Each filter should have a unique color")
     }
 }
 
-// MARK: - KontejnerStats Tests
+// MARK: - WasteStatistics Tests
 
-final class KontejnerStatsTests: XCTestCase {
+final class WasteStatisticsTests: XCTestCase {
 
     func testEquality() {
-        let a = KontejnerStats(totalContainers: 100, totalStations: 20, byKind: [.papir: 50, .sklo: 50])
-        let b = KontejnerStats(totalContainers: 100, totalStations: 20, byKind: [.papir: 50, .sklo: 50])
+        let a = WasteStatistics(totalContainers: 100, totalStations: 20, byKind: [.papir: 50, .sklo: 50])
+        let b = WasteStatistics(totalContainers: 100, totalStations: 20, byKind: [.papir: 50, .sklo: 50])
         XCTAssertEqual(a, b)
     }
 
     func testInequality() {
-        let a = KontejnerStats(totalContainers: 100, totalStations: 20, byKind: [.papir: 50])
-        let b = KontejnerStats(totalContainers: 200, totalStations: 20, byKind: [.papir: 50])
+        let a = WasteStatistics(totalContainers: 100, totalStations: 20, byKind: [.papir: 50])
+        let b = WasteStatistics(totalContainers: 200, totalStations: 20, byKind: [.papir: 50])
         XCTAssertNotEqual(a, b)
     }
 }

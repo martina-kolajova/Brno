@@ -5,8 +5,8 @@ import SwiftUI
 @MainActor
 final class AppViewModel: ObservableObject {
     @Published var selectedTab = 0
-    @Published var stats: KontejnerStats?
-    @Published var allStations: [KontejnerStation] = []
+    @Published var stats: WasteStatistics?
+    @Published var allStations: [WasteStation] = []
     @Published var isLoading = true
     @Published var loadError: String?
 

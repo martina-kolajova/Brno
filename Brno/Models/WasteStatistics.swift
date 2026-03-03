@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Container Statistics
 
-struct KontejnerStats: Equatable {
+struct WasteStatistics: Equatable {
     let totalContainers: Int
     let totalStations: Int
     let byKind: [WasteKind: Int]

@@ -21,7 +21,7 @@ final class BrnoMapViewModel: ObservableObject {
 
     // MARK: - Selection & route
 
-    @Published var selectedStation: KontejnerStation?
+    @Published var selectedStation: WasteStation?
     @Published var route: MKRoute?
     @Published var routeDistance = ""
     @Published var routeTravelTime = ""
@@ -33,20 +33,21 @@ final class BrnoMapViewModel: ObservableObject {
 
     // MARK: - Search & filters
 
-    @Published var selectedFilters: Set<KomoditaFilter> = []
+    @Published var selectedFilters: Set<WasteFilter> = []
     @Published var activeSearchPoint: CLLocationCoordinate2D?
     @Published var showNavigationPanel = false
 
     // MARK: - Navigation state
 
     @Published var isNavigating: Bool = false
-    @Published var activeNavFilter: KomoditaFilter? = nil
+    @Published var activeNavFilter: WasteFilter? = nil
 
     // MARK: - Visible stations (pre-filtered, capped, background-computed)
 
-    @Published var visibleStations: [KontejnerStation] = []
+    @Published var visibleStations: [WasteStation] = []
+    @Published var isRecomputing: Bool = false
     private let maxAnnotations = 200 
-    private var allStationsCache: [KontejnerStation] = []
+    private var allStationsCache: [WasteStation] = []
     private var filterTask: Task<Void, Never>?
     private var regionSubject = PassthroughSubject<Void, Never>()
     private var cancellables = Set<AnyCancellable>()
@@ -60,7 +61,7 @@ final class BrnoMapViewModel: ObservableObject {
     }
 
     /// Call once when stations are loaded.
-    func setAllStations(_ stations: [KontejnerStation]) {
+    func setAllStations(_ stations: [WasteStation]) {
         allStationsCache = stations
         triggerRecompute()
     }
@@ -77,7 +78,7 @@ final class BrnoMapViewModel: ObservableObject {
     }
 
     /// Combines selected filter chips + active nav filter.
-    var effectiveFilters: Set<KomoditaFilter> {
+    var effectiveFilters: Set<WasteFilter> {
         var filters = selectedFilters
         if let nav = activeNavFilter { filters.insert(nav) }
         return filters
@@ -96,8 +97,11 @@ final class BrnoMapViewModel: ObservableObject {
         // No filters active → empty map (no pins)
         guard !filters.isEmpty else {
             visibleStations = []
+            isRecomputing = false
             return
         }
+
+        isRecomputing = true
 
         filterTask = Task.detached(priority: .userInitiated) { [weak self] in
             // 1. Bounding box — only stations visible on screen
@@ -122,13 +126,14 @@ final class BrnoMapViewModel: ObservableObject {
 
             await MainActor.run {
                 self?.visibleStations = capped
+                self?.isRecomputing = false
             }
         }
     }
 
     // MARK: - Station selection
 
-    func selectStation(_ station: KontejnerStation) {
+    func selectStation(_ station: WasteStation) {
         selectedStation = station
         route = nil
         routeDistance = ""
@@ -186,7 +191,7 @@ final class BrnoMapViewModel: ObservableObject {
 
     // MARK: - Quick navigation (find nearest)
 
-    func startQuickNavigation(for filter: KomoditaFilter, in stations: [KontejnerStation], userLocation: CLLocation) {
+    func startQuickNavigation(for filter: WasteFilter, in stations: [WasteStation], userLocation: CLLocation) {
         let base = activeSearchPoint ?? userLocation.coordinate
         if let nearest = findNearest(to: base, for: filter, in: stations) {
             activeNavFilter = filter
@@ -238,7 +243,7 @@ final class BrnoMapViewModel: ObservableObject {
 
     // MARK: - Helpers
 
-    private func findNearest(to center: CLLocationCoordinate2D, for filter: KomoditaFilter, in stations: [KontejnerStation]) -> KontejnerStation? {
+    private func findNearest(to center: CLLocationCoordinate2D, for filter: WasteFilter, in stations: [WasteStation]) -> WasteStation? {
         let centerLoc = CLLocation(latitude: center.latitude, longitude: center.longitude)
         return stations
             .filter { $0.matches(filter) }

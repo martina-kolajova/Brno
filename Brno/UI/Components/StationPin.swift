@@ -15,16 +15,16 @@ import SwiftUI
 /// - No filters: small red dot.
 /// - Filters active: donut pie chart showing matching waste types.
 struct StationPin: View {
-    let station: KontejnerStation
-    let activeFilters: Set<KomoditaFilter>
+    let station: WasteStation
+    let activeFilters: Set<WasteFilter>
     let isSelected: Bool
     let spanDelta: Double
 
     private var filtersActive: Bool { !activeFilters.isEmpty }
 
     /// Sorted for consistent slice order — prevents visual flickering
-    private var matchingFilters: [KomoditaFilter] {
-        KomoditaFilter.allCases.filter { station.matches($0) && activeFilters.contains($0) }
+    private var matchingFilters: [WasteFilter] {
+        WasteFilter.allCases.filter { station.matches($0) && activeFilters.contains($0) }
     }
 
     private var pinSize: CGFloat { isSelected ? 24 : 16 }
