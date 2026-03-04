@@ -1,9 +1,12 @@
 import SwiftUI
+import os
 
 // MARK: - App-level ViewModel (data loading)
 
 @MainActor
 final class AppViewModel: ObservableObject {
+
+    private let logger = Logger(subsystem: "com.app.brno", category: "AppViewModel")
     @Published var selectedTab = 0
     @Published var stats: WasteStatistics?
     @Published var allStations: [WasteStation] = []
@@ -17,6 +20,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func loadData() async {
+        logger.info("📡 Loading data started")
         isLoading = true
         loadError = nil
 
@@ -24,6 +28,7 @@ final class AppViewModel: ObservableObject {
             let result = try await service.fetchAllData()
             stats = result.stats
             allStations = result.stations
+            logger.info("✅ Loaded \(result.stations.count) stations, \(result.stats.totalContainers) containers")
 
             // Brief delay so the loading screen doesn't flash
             try? await Task.sleep(nanoseconds: 1_300_000_000)
@@ -32,6 +37,7 @@ final class AppViewModel: ObservableObject {
                 isLoading = false
             }
         } catch {
+            logger.error("❌ Data load failed: \(error.localizedDescription)")
             withAnimation {
                 loadError = error.localizedDescription
                 isLoading = false

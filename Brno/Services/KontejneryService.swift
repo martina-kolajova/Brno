@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import os
 
 // MARK: - Service Protocol
 
@@ -15,6 +16,9 @@ final class KontejneryService: KontejneryServicing {
     private let pageSize = 1000
     private let maxRetries = 3
 
+    /// Logger for debugging network requests and data parsing.
+    private let logger = Logger(subsystem: "com.app.brno", category: "KontejneryService")
+
     /// URLSession with a 15s timeout so requests don't hang forever.
     private let session: URLSession = {
         let config = URLSessionConfiguration.default
@@ -26,12 +30,18 @@ final class KontejneryService: KontejneryServicing {
     /// Fetches ALL container data using paginated requests, then computes stats + grouped stations.
     func fetchAllData() async throws -> (stats: WasteStatistics, stations: [WasteStation]) {
 
-        // 1. Get total count (tiny request, no geometry)
+        // 1. Get total count of containers (tiny request, no geometry)
         let total = try await fetchTotalCount()
-        guard total > 0 else { return (WasteStatistics(totalContainers: 0, totalStations: 0, byKind: [:]), []) }
+        logger.info("📦 Total containers from API: \(total)")
+
+        guard total > 0 else {
+            logger.warning("⚠️ API returned 0 containers")
+            return (WasteStatistics(totalContainers: 0, totalStations: 0, byKind: [:]), [])
+        }
 
         // 2. Fetch all pages concurrently
         let pageCount = Int(ceil(Double(total) / Double(pageSize)))
+        logger.info("📄 Fetching \(pageCount) pages (pageSize: \(self.pageSize))")
         var allFeatures: [GeoJSONFeature] = []
         allFeatures.reserveCapacity(total)
 
@@ -48,7 +58,9 @@ final class KontejneryService: KontejneryServicing {
         }
 
         // 3. Build result from all features in a single pass
-        return buildResult(from: allFeatures)
+        let result = buildResult(from: allFeatures)
+        logger.info("✅ Loaded \(result.stations.count) stations, \(result.stats.totalContainers) containers")
+        return result
     }
 
     // MARK: - Private API calls
@@ -89,12 +101,14 @@ final class KontejneryService: KontejneryServicing {
                 return try JSONDecoder().decode(GeoJSONResponse.self, from: data).features
             } catch {
                 lastError = error
+                logger.warning("⚠️ Page offset \(offset) attempt \(attempt) failed: \(error.localizedDescription)")
                 if attempt < maxRetries {
                     // Exponential backoff: 1s, 2s, 4s
                     try? await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(attempt - 1))) * 1_000_000_000)
                 }
             }
         }
+        logger.error("❌ Page offset \(offset) failed after \(self.maxRetries) retries")
         throw lastError ?? ServiceError.httpError(statusCode: -1)
     }
 

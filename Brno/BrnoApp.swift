@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import os
 
 @main
 struct BrnoApp: App {
+
+    private let logger = Logger(subsystem: "com.app.brno", category: "AppLifecycle")
+
+    init() {
+        logger.info("🚀 App launched")
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppView()
         }
     }
 }

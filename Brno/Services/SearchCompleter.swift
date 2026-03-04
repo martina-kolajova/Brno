@@ -1,9 +1,11 @@
 import Foundation
 import MapKit
+import os
 
 // MARK: - Search Completer
 
 final class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
+    private let logger = Logger(subsystem: "com.app.brno", category: "SearchCompleter")
     @Published var results: [MKLocalSearchCompletion] = []
     private var completer = MKLocalSearchCompleter()
 
@@ -23,5 +25,9 @@ final class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterD
 
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         results = completer.results.filter { $0.subtitle.contains("Brno") }
+    }
+
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        logger.error("❌ Search autocomplete failed: \(error.localizedDescription)")
     }
 }

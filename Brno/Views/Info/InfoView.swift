@@ -55,7 +55,7 @@ struct InfoView: View {
 
                 Spacer()
                 
-                SwipeHint(direction: .right)
+                SwipeIndicator(direction: .right)
                     .opacity(viewModel.showNumbers ? 1 : 0)
                     .frame(maxWidth: .infinity)
             }

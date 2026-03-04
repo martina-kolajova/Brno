@@ -9,7 +9,7 @@
 import SwiftUI
 
 
-struct SwipeHint: View {
+struct SwipeIndicator: View {
     enum Direction {
         case right, down
     }
