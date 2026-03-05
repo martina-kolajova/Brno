@@ -12,6 +12,9 @@ struct BrnoView: View {
     /// All waste stations fetched from the API — passed in from the parent (ContentView).
     let allStations: [WasteStation]
 
+    /// Callback to navigate back to the Info screen.
+    var onBack: (() -> Void)? = nil
+
     // MARK: - State objects
     // Each @StateObject is created once and survives view re-renders.
 
@@ -26,6 +29,12 @@ struct BrnoView: View {
 
     /// The current text in the address search bar.
     @State private var streetQuery: String = ""
+
+    /// Animates the dash pattern along the route line.
+    @State private var dashPhase: CGFloat = 0
+
+    /// Timer that drives the moving-dash animation (Map content ignores withAnimation).
+    @State private var dashTimer: Timer?
 
     /// Tracks whether the search field is focused (keyboard is open).
     @FocusState private var isSearchFocused: Bool
@@ -67,6 +76,11 @@ struct BrnoView: View {
         }
         // Re-filter pins whenever the user toggles a filter chip.
         .onChange(of: vm.selectedFilters) { vm.triggerRecompute() }
+        // Clean up the dash animation timer when this view is removed.
+        .onDisappear {
+            dashTimer?.invalidate()
+            dashTimer = nil
+        }
     }
 
     // MARK: - Map layer
@@ -106,11 +120,20 @@ struct BrnoView: View {
                 }
             }
 
-            // --- Walking route polyline ---
+            // --- Walking route polyline (dashed + animated) ---
             // Drawn on the map after the user taps "Navigate" in the detail sheet.
             if let route = vm.route {
                 MapPolyline(route.polyline)
-                    .stroke(.red, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                    .stroke(
+                        .red,
+                        style: StrokeStyle(
+                            lineWidth: 3,
+                            lineCap: .round,
+                            lineJoin: .round,
+                            dash: [8, 6],
+                            dashPhase: dashPhase
+                        )
+                    )
             }
 
             // --- User's live GPS dot ---
@@ -120,6 +143,22 @@ struct BrnoView: View {
         // Every time the user scrolls/zooms, update the view-model's region.
         .onMapCameraChange { context in vm.onRegionChanged(context.region) }
         .ignoresSafeArea()
+        // Animate the dash pattern so it flows along the route line.
+        // Map content doesn't support withAnimation, so we use a Timer instead.
+        .onChange(of: vm.route != nil) { _, hasRoute in
+            dashTimer?.invalidate()
+            dashTimer = nil
+            if hasRoute {
+                dashPhase = 0
+                dashTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+                    DispatchQueue.main.async {
+                        dashPhase += 1
+                    }
+                }
+            } else {
+                dashPhase = 0
+            }
+        }
         // --- Detail bottom sheet ---
         // Appears when a station is selected; shows station info + "Navigate" button.
         .sheet(item: $vm.selectedStation) { station in
@@ -143,7 +182,7 @@ struct BrnoView: View {
     private var controlsLayer: some View {
         VStack(spacing: 0) {
             // Horizontal row of filter chips (Paper, Plastic, Glass…) + search field.
-            FiltersBar(selected: $vm.selectedFilters, streetQuery: $streetQuery)
+            FiltersBar(selected: $vm.selectedFilters, streetQuery: $streetQuery, onBack: onBack)
                 .focused($isSearchFocused)
                 .padding(.top, 10)
 
