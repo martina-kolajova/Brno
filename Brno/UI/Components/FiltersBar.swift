@@ -15,6 +15,8 @@ import MapKit
 struct FiltersBar: View {
     @Binding var selected: Set<WasteFilter>
     @Binding var streetQuery: String
+    /// Callback to navigate back to the Info screen (orloj button).
+    var onBack: (() -> Void)? = nil
     @State private var showFilters: Bool = false
 
     var body: some View {
@@ -29,9 +31,18 @@ struct FiltersBar: View {
 
     private var searchBar: some View {
         HStack(spacing: 12) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-                .font(.system(size: 16, weight: .semibold))
+            // Back button — tapping navigates back to the Info screen.
+            if let onBack {
+                Button(action: { withAnimation { onBack() } }) {
+                    Image(systemName: "chevron.backward.circle.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.red)
+                }
+            } else {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 16, weight: .semibold))
+            }
 
             TextField("Hledej ulicu v Štatlu...", text: $streetQuery)
                 .textFieldStyle(.plain)
