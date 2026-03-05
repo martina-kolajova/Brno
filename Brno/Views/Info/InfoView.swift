@@ -51,6 +51,15 @@ struct InfoView: View {
                         insertion: .move(edge: .bottom).combined(with: .opacity),
                         removal: .opacity
                     ))
+
+                    // Hint that the chart segments are tappable
+                    if viewModel.showNumbers {
+                        Text("Klikni na kategorii pro více info")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.gray)
+                            .frame(maxWidth: .infinity)
+                            .transition(.opacity)
+                    }
                 }
 
                 Spacer()
