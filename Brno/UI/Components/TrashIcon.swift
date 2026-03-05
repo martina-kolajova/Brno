@@ -4,7 +4,7 @@
 //
 //  Created by Martina Kolajová on 04.03.2026.
 //
-
+import SwiftUI
 
 // MARK: - Custom Trash Can
 

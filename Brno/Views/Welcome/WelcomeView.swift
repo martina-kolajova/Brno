@@ -5,32 +5,46 @@
 //  Created by Martina Kolajová on 27.01.2026.
 //
 
-
 import SwiftUI
 
+
+// MARK: - Welcome View
+
 struct WelcomeView: View {
-    @State private var colorProgress: Double = 0
-    @State private var dropped = false
-    var onFinished: () -> Void // <--- Přidáno
-    @State private var exitOffset: CGFloat = 0 // 1. Přidáme stav pro odjezd
-    
-    
+    var onFinished: () -> Void
+
+    // Animation states
+    @State private var tipped = false      // trash tips 90° left
+    @State private var lidOpen = false      // lid opens after tipping
+    @State private var exitOffset: CGFloat = 0
+
+    /// Current colour — black at start, red after tipping
+    private var accentColor: Color { tipped ? .red : .black }
+
     var body: some View {
         ZStack {
             Color.white.ignoresSafeArea()
-            
-            VStack(spacing: 70) {
-                Image(systemName: "trash")
-                    .font(.system(size: 60, weight: .medium))
-                    .foregroundStyle(dropped ? .red : .black)
-                    .rotationEffect(.degrees(dropped ? -180 : 0), anchor: .bottom)
-                    .offset(x: dropped ? -12 : 0)
 
+            VStack(spacing: 3) {
+
+                // Trash can — tips 90° to the left, pivoting from its bottom-left corner
+                TrashCanView(
+                    lidAngle: lidOpen ? -60 : 0,
+                    color: accentColor
+                )
+                .scaleEffect(0.92) // Slightly smaller than the final size for a subtle "pop" when it falls
+                .rotationEffect(
+                    .degrees(tipped ? -90 : 0),
+                    anchor: .bottomLeading
+                )
+                .offset(x: 60)
+
+                // App title
                 HStack(spacing: 3) {
                     Text("Wasted")
                         .font(.system(size: 44, weight: .medium))
-                        .foregroundStyle(dropped ? .red : .black)
-                    
+                        .foregroundStyle(accentColor)
+
                     Text("Brno")
                         .font(.system(size: 44, weight: .medium))
                         .foregroundStyle(.black)
@@ -39,29 +53,27 @@ struct WelcomeView: View {
             .offset(x: exitOffset)
         }
         .onAppear {
-            
-            // --- RYCHLOST ZABARVENÍ ---
-            // duration: 2.0 znamená, že se nápis barví 2 vteřiny
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                
-                // 2. BARVENÍ: Teď se začne plynule barvit (trvá to 2 sekundy)
-                withAnimation(.easeInOut(duration: 2.0)) {
-                    colorProgress = 1.0
+            // Small initial pause so the screen isn't instant
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+
+                // Phase A: Tip the trash can 90° to the left + turn red
+                withAnimation(.easeIn(duration: 0.45)) {
+                    tipped = true
                 }
-                // FÁZE A: Pád nápisu
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                    withAnimation(.easeOut(duration: 0.4)) {
-                        dropped = true
+
+                // Phase B: Open the lid after the can has fallen
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.5)) {
+                        lidOpen = true
                     }
-                    
-                    // FÁZE B: ODJEZD (Tady nastavuješ rychlost)
+
+                    // Phase C: Slide everything off screen to the left
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        // RYCHLOST ODJEZDU: duration upravuješ zde (např. 0.8 nebo 1.2)
                         withAnimation(.easeInOut(duration: 3)) {
-                            exitOffset = -1000 // Odjede doleva
+                            exitOffset = -1000
                         }
-                        
-                        // Přepnutí proběhne s malým zpožděním po začátku odjezdu
+
+                        // Transition to next screen
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                             onFinished()
                         }
@@ -72,7 +84,7 @@ struct WelcomeView: View {
     }
 }
 
-// MARK: - Preview
+// MARK: - Previews
 
 #Preview("Default") {
     WelcomeView(onFinished: {})
@@ -81,22 +93,20 @@ struct WelcomeView: View {
 #Preview("Fallen") {
     ZStack {
         Color.white.ignoresSafeArea()
-        VStack(spacing: 60) {
-            Image(systemName: "trash")
-                .font(.system(size: 60, weight: .regular))
-                .foregroundStyle(.red)
-                .rotationEffect(.degrees(-180), anchor: .bottom)
-                .offset(x: -12)
-
+        VStack(spacing: 3) {
+            TrashCanView(lidAngle: -60, color: .red)
+                .scaleEffect(0.92)
+                .rotationEffect(.degrees(-90), anchor: .bottomLeading)
+                .offset(x: 60)
             HStack(spacing: 3) {
                 Text("Wasted")
-                    .font(.system(size: 44, weight: .regular))
+                    .font(.system(size: 44, weight: .medium))
                     .foregroundStyle(.red)
                 Text("Brno")
-                    .font(.system(size: 44, weight: .regular))
+                    .font(.system(size: 44, weight: .medium))
                     .foregroundStyle(.black)
             }
         }
     }
 }
-
+//
