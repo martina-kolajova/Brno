@@ -41,11 +41,17 @@ struct WasteStatsChart: View {
                         let midY = (yCuts[i] + yCuts[i+1]) / 2 * h
                         
                         Button(action: { onSelect(order[i]) }) {
-                            Text(order[i].titleShortUpper)
-                                .font(.system(size: 16, weight: .black))
-                                .foregroundStyle(.black)
-                                .frame(width: w, height: (yCuts[i+1] - yCuts[i]) * h)
-                                .contentShape(Rectangle())
+                            HStack(spacing: 6) {
+                                Text(order[i].titleShortUpper)
+                                    .font(.system(size: 16, weight: .black))
+                                    .foregroundStyle(.black)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundStyle(.gray.opacity(0.6))
+                            }
+                            .frame(width: w, height: (yCuts[i+1] - yCuts[i]) * h)
+                            .contentShape(Rectangle())
                         }
                         .position(x: w / 2, y: midY)
                     }
