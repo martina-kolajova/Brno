@@ -86,7 +86,11 @@ struct AppView: View {
                     // when the user actually navigates to this tab (lazy loading).
                     Group {
                         if vm.selectedTab == 2 {
-                            BrnoView(allStations: vm.allStations)
+                            BrnoView(allStations: vm.allStations, onBack: {
+                                withAnimation(.easeInOut(duration: 0.4)) {
+                                    vm.selectedTab = 1
+                                }
+                            })
                         } else {
                             Color.clear   // lightweight placeholder while on other tabs
                         }
