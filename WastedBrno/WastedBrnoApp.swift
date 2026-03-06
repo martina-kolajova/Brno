@@ -9,7 +9,7 @@ import SwiftUI
 import os
 
 @main
-struct BrnoApp: App {
+struct WastedBrnoApp: App {
 
     private let logger = Logger(subsystem: "com.app.brno", category: "AppLifecycle")
 
@@ -23,3 +23,4 @@ struct BrnoApp: App {
         }
     }
 }
+
