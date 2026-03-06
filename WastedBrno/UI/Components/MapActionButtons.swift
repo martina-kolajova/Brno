@@ -49,25 +49,30 @@ struct MapActionButtons: View {
         .zIndex(10)
     }
 
-    // MARK: - Stop Navigation
+    // MARK: - Zoom Out
 
-    @ViewBuilder
     private var stopButton: some View {
-        if vm.isNavigating {
-            Button {
-                withAnimation(.spring(response: 0.35)) {
+        Button {
+            withAnimation(.easeInOut(duration: 0.4)) {
+                // If navigating, stop navigation and clear everything.
+                if vm.isNavigating {
                     vm.stopNavigation()
                     onClearSearch()
+                } else {
+                    // Otherwise just zoom out to the default Brno overview.
+                    vm.camera = .region(MKCoordinateRegion(
+                        center: LocationManager.defaultBrnoCoordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                    ))
                 }
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(Color.red))
-                    .shadow(color: .black.opacity(0.15), radius: 4)
             }
-            .transition(.scale.combined(with: .opacity))
+        } label: {
+            Image(systemName: "minus.magnifyingglass")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(Circle().fill(Color.red))
+                .shadow(color: .black.opacity(0.15), radius: 4)
         }
     }
 

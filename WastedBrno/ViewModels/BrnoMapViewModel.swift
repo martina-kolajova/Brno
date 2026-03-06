@@ -234,6 +234,10 @@ final class BrnoMapViewModel: ObservableObject {
         routeTravelTime = ""
         isNavigating = false
         activeNavFilter = nil
+        activeSearchPoint = nil
+        // Re-filter visible stations since activeNavFilter changed —
+        // without this, stale pins from the old nav filter remain on the map.
+        triggerRecompute()
     }
 
     /// Ends active navigation: clears route, station, nav filter, and resets the camera to Brno centre.

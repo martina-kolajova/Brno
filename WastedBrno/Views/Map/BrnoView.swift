@@ -36,6 +36,10 @@ struct BrnoView: View {
     /// Timer that drives the moving-dash animation (Map content ignores withAnimation).
     @State private var dashTimer: Timer?
 
+    /// Whether the camera has already been moved to the user's GPS location.
+    /// Ensures we only auto-center once — after that the user can scroll freely.
+    @State private var hasLocatedUser = false
+
     /// Tracks whether the search field is focused (keyboard is open).
     @FocusState private var isSearchFocused: Bool
 
@@ -76,6 +80,20 @@ struct BrnoView: View {
         }
         // Re-filter pins whenever the user toggles a filter chip.
         .onChange(of: vm.selectedFilters) { vm.triggerRecompute() }
+        // Move camera to user's real GPS location once (if they're in Brno).
+        // If outside Brno or location denied, the default Brno centre stays.
+        .onChange(of: locationManager.lastLocation) { _, newLocation in
+            guard !hasLocatedUser, let location = newLocation else { return }
+            hasLocatedUser = true
+            if locationManager.isInBrno {
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    vm.camera = .region(MKCoordinateRegion(
+                        center: location.coordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                    ))
+                }
+            }
+        }
         // Clean up the dash animation timer when this view is removed.
         .onDisappear {
             dashTimer?.invalidate()
@@ -150,7 +168,7 @@ struct BrnoView: View {
             dashTimer = nil
             if hasRoute {
                 dashPhase = 0
-                dashTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { _ in
+                dashTimer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { _ in
                     DispatchQueue.main.async {
                         dashPhase += 2
                     }
@@ -161,12 +179,14 @@ struct BrnoView: View {
         }
         // --- Detail bottom sheet ---
         // Appears when a station is selected; shows station info + "Navigate" button.
-        .sheet(item: $vm.selectedStation) { station in
+        // onDismiss ensures clearStation() runs for ALL dismissal methods
+        // (swipe down, tap X, tap outside) — not just the X button.
+        .sheet(item: $vm.selectedStation, onDismiss: { vm.clearStation() }) { station in
             DetailStationPanel(
                 station: station,
                 navInfo: vm.routeDistance.isEmpty ? nil : "\(vm.routeDistance) • \(vm.routeTravelTime)",
                 onNavigate: { vm.calculateRoute(to: station.coordinate, userLocation: locationManager.effectiveLocation) },
-                onClose: { vm.clearStation() },
+                onClose: { vm.selectedStation = nil },
                 detent: $vm.detent
             )
             .presentationDragIndicator(.visible)
