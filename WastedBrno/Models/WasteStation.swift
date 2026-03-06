@@ -14,8 +14,10 @@ struct WasteStation: Identifiable {
 
 extension WasteStation {
     /// Returns true if the station has containers matching the given filter.
+    /// Uses matchKey (e.g. "pap") instead of displayName for more robust matching
+    /// against komodity strings like "Papír a kartón".
     func matches(_ filter: WasteFilter) -> Bool {
-        komodity.contains { $0.lowercased().contains(filter.rawValue.lowercased()) }
+        komodity.contains { $0.lowercased().contains(filter.matchKey) }
     }
 
     /// Returns the first matching filter (used for dominant color).

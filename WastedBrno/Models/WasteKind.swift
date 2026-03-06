@@ -23,14 +23,20 @@ extension WasteKind {
         let education: String
     }
 
-    /// Loads the matching entry from WasteKindData.json.
-    private var jsonData: WasteDataEntry? {
+    /// Static cache — loads and decodes the JSON file once for the entire app lifetime.
+    /// Avoids re-reading from disk on every .title, .color, .hint, etc. access.
+    private static let allEntries: [WasteDataEntry] = {
         guard let url = Bundle.main.url(forResource: "WasteKindData", withExtension: "json"),
               let data = try? Data(contentsOf: url),
               let entries = try? JSONDecoder().decode([WasteDataEntry].self, from: data) else {
-            return nil
+            return []
         }
-        return entries.first(where: { $0.id == self.rawValue })
+        return entries
+    }()
+
+    /// Finds the matching entry from the cached JSON data.
+    private var jsonData: WasteDataEntry? {
+        Self.allEntries.first(where: { $0.id == self.rawValue })
     }
 
     var title: String {
