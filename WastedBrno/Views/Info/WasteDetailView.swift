@@ -12,21 +12,16 @@ import SwiftUI
 struct WasteDetailView: View {
     let kind: WasteKind
     let count: Int
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ScrollView {
             VStack(spacing: 30) {
-                // Vrchní linka
-                Capsule()
-                    .frame(width: 40, height: 6)
-                    .foregroundStyle(.gray.opacity(0.3))
-                    .padding(.top, 15)
 
                 // Název kategorie - Barva teď jde z JSONu přes kind.color
                 Text(kind.titleShortUpper)
                     .font(.system(size: 44, weight: .black))
                     .foregroundStyle(kind.color)
+                    .padding(.top, 15)
 
                 // Hlavní statistika z API
                 VStack(spacing: 0) {
@@ -79,17 +74,7 @@ struct WasteDetailView: View {
                 .background(Color.blue.opacity(0.05))
                 .cornerRadius(24)
 
-                Button(action: { dismiss() }) {
-                    Text("ZAVŘÍT")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity) // První frame pro šířku
-                        .frame(height: 56)          // Druhý frame pro výšku
-                        .background(Color.black)
-                        .cornerRadius(18)
-                }
-                .padding(.top, 20)
-                .padding(.bottom, 40)
+                Spacer(minLength: 40)
             }
             .padding(.horizontal)
         }

@@ -12,7 +12,6 @@ struct DetailStationPanel: View {
     let station: WasteStation
     let navInfo: String?
     var onNavigate: () -> Void
-    var onClose: () -> Void
     @Binding var detent: PresentationDetent
 
     private var isCollapsed: Bool { detent == .height(70) }

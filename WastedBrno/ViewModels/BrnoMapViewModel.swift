@@ -227,6 +227,7 @@ final class BrnoMapViewModel: ObservableObject {
     }
 
     /// Deselects the current station and clears all route + navigation state.
+    /// Does NOT zoom out — the user stays where they are on the map.
     func clearStation() {
         selectedStation = nil
         route = nil
@@ -235,20 +236,14 @@ final class BrnoMapViewModel: ObservableObject {
         isNavigating = false
         activeNavFilter = nil
         activeSearchPoint = nil
-        // Re-filter visible stations since activeNavFilter changed —
-        // without this, stale pins from the old nav filter remain on the map.
+        // Re-filter visible stations since activeNavFilter changed.
         triggerRecompute()
     }
 
-    /// Ends active navigation: clears route, station, nav filter, and resets the camera to Brno centre.
+    /// Ends active navigation AND zooms back to the default Brno overview.
+    /// Called by the zoom-out button on the map.
     func stopNavigation() {
-        route = nil
-        routeDistance = ""
-        routeTravelTime = ""
-        selectedStation = nil
-        isNavigating = false
-        activeNavFilter = nil
-        activeSearchPoint = nil
+        clearStation()
         withAnimation(.easeInOut(duration: 0.4)) {
             camera = .region(MKCoordinateRegion(
                 center: LocationManager.defaultBrnoCoordinate,

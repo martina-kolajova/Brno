@@ -185,13 +185,15 @@ struct BrnoView: View {
             DetailStationPanel(
                 station: station,
                 navInfo: vm.routeDistance.isEmpty ? nil : "\(vm.routeDistance) • \(vm.routeTravelTime)",
-                onNavigate: { vm.calculateRoute(to: station.coordinate, userLocation: locationManager.effectiveLocation) },
-                onClose: { vm.selectedStation = nil },
+                onNavigate: {
+                    vm.calculateRoute(to: station.coordinate, userLocation: locationManager.effectiveLocation)
+                },
                 detent: $vm.detent
             )
             .presentationDragIndicator(.visible)
             .presentationContentInteraction(.scrolls)
             .presentationDetents([.fraction(0.37), .large, .height(70)], selection: $vm.detent)
+            .presentationBackgroundInteraction(.enabled)
             .onAppear { vm.detent = .fraction(0.37) }     // open at ~37% height by default
         }
     }
