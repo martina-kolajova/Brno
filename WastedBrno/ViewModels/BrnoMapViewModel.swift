@@ -14,7 +14,7 @@ import os
 final class BrnoMapViewModel: ObservableObject {
 
     /// Logger for map interactions, filtering, and route calculation.
-    private let logger = Logger(subsystem: "com.app.brno", category: "MapViewModel")
+    private let logger = Logger(subsystem: "com.WastedBrno", category: "MapViewModel")
 
     // MARK: - Map state
     // Controls what part of the map the user sees.
@@ -218,7 +218,7 @@ final class BrnoMapViewModel: ObservableObject {
         selectedStation = station
         route = nil
         routeDistance = ""
-        withAnimation(.spring()) {
+        withAnimation(.easeInOut(duration: 0.4)) {
             camera = .region(MKCoordinateRegion(
                 center: station.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
@@ -226,12 +226,14 @@ final class BrnoMapViewModel: ObservableObject {
         }
     }
 
-    /// Deselects the current station and clears route info.
+    /// Deselects the current station and clears all route + navigation state.
     func clearStation() {
         selectedStation = nil
         route = nil
         routeDistance = ""
         routeTravelTime = ""
+        isNavigating = false
+        activeNavFilter = nil
     }
 
     /// Ends active navigation: clears route, station, nav filter, and resets the camera to Brno centre.
@@ -243,7 +245,7 @@ final class BrnoMapViewModel: ObservableObject {
         isNavigating = false
         activeNavFilter = nil
         activeSearchPoint = nil
-        withAnimation(.spring()) {
+        withAnimation(.easeInOut(duration: 0.4)) {
             camera = .region(MKCoordinateRegion(
                 center: LocationManager.defaultBrnoCoordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -264,7 +266,7 @@ final class BrnoMapViewModel: ObservableObject {
             }
             self.logger.info("🔍 Address found: \(coord.latitude), \(coord.longitude)")
             self.activeSearchPoint = coord
-            withAnimation(.spring()) {
+            withAnimation(.easeInOut(duration: 0.4)) {
                 self.camera = .region(MKCoordinateRegion(
                     center: coord,
                     span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
@@ -310,7 +312,7 @@ final class BrnoMapViewModel: ObservableObject {
                 let response = try await MKDirections(request: request).calculate()
                 guard let computedRoute = response.routes.first else { return }
 
-                withAnimation(.spring()) {
+                withAnimation(.easeInOut(duration: 0.4)) {
                     self.route = computedRoute
                     self.isNavigating = true
 

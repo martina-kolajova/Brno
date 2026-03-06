@@ -6,7 +6,7 @@ import os
 
 final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
-    private let logger = Logger(subsystem: "com.app.brno", category: "Location")
+    private let logger = Logger(subsystem: "com.WastedBrno", category: "Location")
 
     static let defaultBrnoCoordinate = CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068)
     private static let brnoRadius: CLLocationDistance = 15_000 // ~15 km

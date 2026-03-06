@@ -5,7 +5,7 @@ import os
 // MARK: - Search Completer
 
 final class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
-    private let logger = Logger(subsystem: "com.app.brno", category: "SearchCompleter")
+    private let logger = Logger(subsystem: "com.WastedBrno", category: "SearchCompleter")
     @Published var results: [MKLocalSearchCompletion] = []
     private var completer = MKLocalSearchCompleter()
 

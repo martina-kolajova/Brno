@@ -17,7 +17,7 @@ final class KontejneryService: KontejneryServicing {
     private let maxRetries = 3
 
     /// Logger for debugging network requests and data parsing.
-    private let logger = Logger(subsystem: "com.app.brno", category: "KontejneryService")
+    private let logger = Logger(subsystem: "com.WastedBrno", category: "KontejneryService")
 
     /// URLSession with a 15s timeout so requests don't hang forever.
     private let session: URLSession = {

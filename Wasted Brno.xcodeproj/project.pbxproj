@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2A1ECC9A2F398A3200A12850 /* Brno.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 2A1ECC992F398A0A00A12850 /* Brno.gpx */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		2AA3FAFB2F29A47B00194DE9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -28,7 +24,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2A1ECC992F398A0A00A12850 /* Brno.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brno.gpx; sourceTree = "<group>"; };
 		2AA3FAED2F29A47A00194DE9 /* Wasted Brno.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Wasted Brno.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FAFA2F29A47B00194DE9 /* Wasted BrnoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wasted BrnoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FB042F29A47B00194DE9 /* Wasted BrnoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wasted BrnoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,7 +88,6 @@
 		2AA3FAE42F29A47A00194DE9 = {
 			isa = PBXGroup;
 			children = (
-				2A1ECC992F398A0A00A12850 /* Brno.gpx */,
 				2AA3FAEF2F29A47A00194DE9 /* WastedBrno */,
 				2AA3FAFD2F29A47B00194DE9 /* WastedBrnoTests */,
 				2AA3FB072F29A47B00194DE9 /* WastedBrnoUITests */,
@@ -231,7 +225,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A1ECC9A2F398A3200A12850 /* Brno.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,7 +429,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.martina.WastedBrno;
+				PRODUCT_BUNDLE_IDENTIFIER = com.WastedBrno;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -468,7 +461,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.martina.WastedBrno;
+				PRODUCT_BUNDLE_IDENTIFIER = com.WastedBrno;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

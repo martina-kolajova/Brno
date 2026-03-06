@@ -6,7 +6,7 @@ import os
 @MainActor
 final class AppViewModel: ObservableObject {
 
-    private let logger = Logger(subsystem: "com.app.brno", category: "AppViewModel")
+    private let logger = Logger(subsystem: "com.app.wastedbrno", category: "AppViewModel")
     @Published var selectedTab = 0
     @Published var stats: WasteStatistics?
     @Published var allStations: [WasteStation] = []
@@ -31,7 +31,7 @@ final class AppViewModel: ObservableObject {
             logger.info("✅ Loaded \(result.stations.count) stations, \(result.stats.totalContainers) containers")
 
             // Brief delay so the loading screen doesn't flash
-            try? await Task.sleep(nanoseconds: 1_300_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
 
             withAnimation(.easeInOut(duration: 0.5)) {
                 isLoading = false

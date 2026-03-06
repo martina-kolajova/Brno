@@ -11,7 +11,7 @@ import os
 @main
 struct WastedBrnoApp: App {
 
-    private let logger = Logger(subsystem: "com.app.brno", category: "AppLifecycle")
+    private let logger = Logger(subsystem: "com.WastedBrno", category: "AppLifecycle")
 
     init() {
         logger.info("🚀 App launched")

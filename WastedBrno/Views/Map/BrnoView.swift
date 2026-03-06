@@ -100,7 +100,7 @@ struct BrnoView: View {
                         spanDelta: vm.mapRegion.span.latitudeDelta
                     )
                     .onTapGesture {
-                        withAnimation(.spring()) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
                             isSearchFocused = false       // dismiss keyboard
                             vm.selectStation(st)          // zoom in + open detail sheet
                         }
@@ -150,9 +150,9 @@ struct BrnoView: View {
             dashTimer = nil
             if hasRoute {
                 dashPhase = 0
-                dashTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+                dashTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: true) { _ in
                     DispatchQueue.main.async {
-                        dashPhase += 1
+                        dashPhase += 2
                     }
                 }
             } else {
