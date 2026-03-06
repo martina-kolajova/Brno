@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2AA3FAEC2F29A47A00194DE9"
-               BuildableName = "Wasted Brno.app"
-               BlueprintName = "Wasted Brno"
-               ReferencedContainer = "container:Wasted Brno.xcodeproj">
+               BuildableName = "WastedBrno.app"
+               BlueprintName = "WastedBrno"
+               ReferencedContainer = "container:WastedBrno.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2AA3FAF92F29A47B00194DE9"
-               BuildableName = "Wasted BrnoTests.xctest"
-               BlueprintName = "Wasted BrnoTests"
-               ReferencedContainer = "container:Wasted Brno.xcodeproj">
+               BuildableName = "WastedBrnoTests.xctest"
+               BlueprintName = "WastedBrnoTests"
+               ReferencedContainer = "container:WastedBrno.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2AA3FB032F29A47B00194DE9"
-               BuildableName = "Wasted BrnoUITests.xctest"
-               BlueprintName = "Wasted BrnoUITests"
-               ReferencedContainer = "container:Wasted Brno.xcodeproj">
+               BuildableName = "WastedBrnoUITests.xctest"
+               BlueprintName = "WastedBrnoUITests"
+               ReferencedContainer = "container:WastedBrno.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2AA3FAEC2F29A47A00194DE9"
-            BuildableName = "Wasted Brno.app"
-            BlueprintName = "Wasted Brno"
-            ReferencedContainer = "container:Wasted Brno.xcodeproj">
+            BuildableName = "WastedBrno.app"
+            BlueprintName = "WastedBrno"
+            ReferencedContainer = "container:WastedBrno.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <LocationScenarioReference
@@ -90,9 +90,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2AA3FAEC2F29A47A00194DE9"
-            BuildableName = "Wasted Brno.app"
-            BlueprintName = "Wasted Brno"
-            ReferencedContainer = "container:Wasted Brno.xcodeproj">
+            BuildableName = "WastedBrno.app"
+            BlueprintName = "WastedBrno"
+            ReferencedContainer = "container:WastedBrno.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

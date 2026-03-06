@@ -1,6 +1,6 @@
 import XCTest
 import CoreLocation
-@testable import Brno
+@testable import WastedBrno
 
 // MARK: - Mock API Service
 
@@ -207,6 +207,119 @@ final class BrnoMapViewModelTests: XCTestCase {
 
         XCTAssertNil(vm.activeSearchPoint)
     }
+
+    // clearStation() must also reset isNavigating and activeNavFilter
+    // (these caused the "red dots" bug — stale nav pins remained after dismiss)
+    func testClearStation_resetsNavigationState() {
+        let vm = BrnoMapViewModel()
+        vm.isNavigating = true
+        vm.activeNavFilter = .sklo
+        vm.activeSearchPoint = CLLocationCoordinate2D(latitude: 49.2, longitude: 16.6)
+
+        vm.clearStation()
+
+        XCTAssertFalse(vm.isNavigating)
+        XCTAssertNil(vm.activeNavFilter)
+        XCTAssertNil(vm.activeSearchPoint)
+    }
+
+    // selectStation() must clear routeTravelTime from a previous route
+    // so the detail sheet doesn't briefly show stale "5 min" when tapping a new pin
+    func testSelectStation_clearsTravelTime() {
+        let vm = BrnoMapViewModel()
+        vm.routeTravelTime = "5 min"
+        vm.routeDistance = "800 m"
+
+        vm.selectStation(WasteStation.mock())
+
+        XCTAssertEqual(vm.routeTravelTime, "")
+        XCTAssertEqual(vm.routeDistance, "")
+    }
+
+    // stopNavigation() must reset ALL state including isNavigating
+    func testStopNavigation_resetsIsNavigating() {
+        let vm = BrnoMapViewModel()
+        vm.isNavigating = true
+        vm.activeNavFilter = .bio
+        vm.routeTravelTime = "3 min"
+
+        vm.stopNavigation()
+
+        XCTAssertFalse(vm.isNavigating)
+        XCTAssertNil(vm.activeNavFilter)
+        XCTAssertEqual(vm.routeTravelTime, "")
+    }
+
+    // setAllStations + filter pipeline: after setting stations and a filter,
+    // visibleStations should be populated (debounced 100ms)
+    func testSetAllStations_populatesVisibleStations() async throws {
+        let vm = BrnoMapViewModel()
+        let stations = [
+            WasteStation.mock(id: "1", komodity: ["Papír"]),
+            WasteStation.mock(id: "2", komodity: ["Sklo"]),
+            WasteStation.mock(id: "3", komodity: ["Papír", "Plast"])
+        ]
+
+        vm.selectedFilters = [.papir]
+        vm.setAllStations(stations)
+
+        // Wait for debounce (100ms) + background task
+        try await Task.sleep(nanoseconds: 400_000_000)
+
+        // Only stations with papír should be visible
+        XCTAssertTrue(vm.visibleStations.allSatisfy { $0.matches(.papir) })
+        XCTAssertFalse(vm.visibleStations.contains { $0.id == "2" }) // sklo only — should not appear
+    }
+
+    // With no filters selected, visibleStations should be empty
+    func testNoFilters_visibleStationsIsEmpty() async throws {
+        let vm = BrnoMapViewModel()
+        vm.selectedFilters = []
+        vm.setAllStations([WasteStation.mock(), WasteStation.mock()])
+
+        try await Task.sleep(nanoseconds: 400_000_000)
+
+        XCTAssertTrue(vm.visibleStations.isEmpty)
+    }
+
+    // effectiveFilters with no nav filter and no selected filters = empty
+    func testEffectiveFilters_empty_whenNoFiltersSelected() {
+        let vm = BrnoMapViewModel()
+        vm.selectedFilters = []
+        vm.activeNavFilter = nil
+
+        XCTAssertTrue(vm.effectiveFilters.isEmpty)
+    }
+
+    // startQuickNavigation should find the nearest station with the given filter
+    func testStartQuickNavigation_setsSelectedStation() {
+        let vm = BrnoMapViewModel()
+
+        // Station A — far from Brno centre
+        let far = WasteStation.mock(id: "far", komodity: ["Papír"], lat: 49.30, lon: 16.60)
+        // Station B — close to Brno centre
+        let near = WasteStation.mock(id: "near", komodity: ["Papír"], lat: 49.195, lon: 16.607)
+
+        let userLocation = CLLocation(latitude: 49.1951, longitude: 16.6068)
+        vm.startQuickNavigation(for: .papir, in: [far, near], userLocation: userLocation)
+
+        XCTAssertEqual(vm.selectedStation?.id, "near")
+        XCTAssertTrue(vm.isNavigating)
+        XCTAssertEqual(vm.activeNavFilter, .papir)
+    }
+
+    // startQuickNavigation with no matching stations — should not crash or change state
+    func testStartQuickNavigation_noMatchingStations_doesNothing() {
+        let vm = BrnoMapViewModel()
+        let stations = [WasteStation.mock(komodity: ["Sklo"])]
+        let userLocation = CLLocation(latitude: 49.1951, longitude: 16.6068)
+
+        vm.startQuickNavigation(for: .papir, in: stations, userLocation: userLocation)
+
+        XCTAssertNil(vm.selectedStation)
+        XCTAssertFalse(vm.isNavigating)
+        XCTAssertNil(vm.activeNavFilter)
+    }
 }
 
 // MARK: - WasteFilter Tests
@@ -251,3 +364,4 @@ final class WasteStatisticsTests: XCTestCase {
         XCTAssertNotEqual(a, b)
     }
 }
+, nazev: <#String#>, nazev: <#String#>, nazev: <#String#>
