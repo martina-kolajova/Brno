@@ -218,6 +218,7 @@ final class BrnoMapViewModel: ObservableObject {
         selectedStation = station
         route = nil
         routeDistance = ""
+        routeTravelTime = ""
         withAnimation(.easeInOut(duration: 0.4)) {
             camera = .region(MKCoordinateRegion(
                 center: station.coordinate,
@@ -235,8 +236,9 @@ final class BrnoMapViewModel: ObservableObject {
         routeTravelTime = ""
         isNavigating = false
         activeNavFilter = nil
-        activeSearchPoint = nil
-        // Re-filter visible stations since activeNavFilter changed.
+        // NOTE: activeSearchPoint is intentionally NOT cleared here
+        // so the "Tady su" pin stays visible after dismissing the detail panel.
+        // It is only cleared by stopNavigation() or selectAddress().
         triggerRecompute()
     }
 
@@ -244,6 +246,7 @@ final class BrnoMapViewModel: ObservableObject {
     /// Called by the zoom-out button on the map.
     func stopNavigation() {
         clearStation()
+        activeSearchPoint = nil   // ← clear search pin only on full stop/zoom-out
         withAnimation(.easeInOut(duration: 0.4)) {
             camera = .region(MKCoordinateRegion(
                 center: LocationManager.defaultBrnoCoordinate,
@@ -257,6 +260,9 @@ final class BrnoMapViewModel: ObservableObject {
 
     /// Takes a search completion result, geocodes it, and moves the camera there.
     func selectAddress(_ completion: MKLocalSearchCompletion) {
+        // Clear any previous station selection, route, and navigation state
+        // so the detail panel from a previous find is dismissed first.
+        clearStation()
         let request = MKLocalSearch.Request(completion: completion)
         MKLocalSearch(request: request).start { [weak self] response, error in
             guard let self, let coord = response?.mapItems.first?.placemark.coordinate else {
