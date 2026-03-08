@@ -3,7 +3,7 @@
     "id": "papir",
     "title": "Papír",
     "titleShortUpper": "PAPÍR",
-    "colorHex": "#005DAA",
+    "colorHex": "#4A90D9",
     "hint": "Noviny, časopisy, letáky, sešity, krabice (rozložené), papírové obaly, lepenka, knihy bez vazby, obálky s fóliovými okýnky.",
     "warning": "Nepatří sem: Mokrý, mastný nebo jinak znečištěný papír, účtenky z termopapíru, použité pleny a hygienické potřeby.",
     "education": "Papír lze recyklovat 5–7krát. Recyklací 1 tuny papíru zachráníte 17 dospělých stromů."
@@ -12,7 +12,7 @@
     "id": "plast",
     "title": "Plast, kovy a nápojové kartony",
     "titleShortUpper": "PLAST",
-    "colorHex": "#FFD700",
+    "colorHex": "#F5C842",
     "hint": "V Brně dáváme do žlutých kontejnerů společně: PET lahve, obaly od kosmetiky, kelímky od jogurtů, plechovky, hliníková víčka i krabice od džusů a mléka.",
     "warning": "Nepatří sem: Obaly od žíravin, barev a jiných nebezpečných látek, podlahové krytiny či novodurové trubky.",
     "education": "Díky nejmodernější dotřiďovací lince v ČR dokáže SAKO Brno tyto materiály efektivně oddělit a poslat k další recyklaci."
@@ -21,7 +21,7 @@
     "id": "sklo",
     "title": "Sklo",
     "titleShortUpper": "SKLO",
-    "colorHex": "#008751",
+    "colorHex": "#34C759",
     "hint": "Láhve od nápojů, zavařovací sklenice, skleněné nádoby, tabulové sklo z oken a dveří.",
     "warning": "Nepatří sem: Keramika, porcelán, autosklo, zrcadla, drátované sklo, zlacená a pokovená skla nebo laboratorní sklo (varné).",
     "education": "Sklo je materiál, který lze recyklovat donekonečna, aniž by ztratilo na kvalitě. Ušetří se tím obrovské množství energie."
@@ -30,7 +30,7 @@
     "id": "textil",
     "title": "Textil",
     "titleShortUpper": "TEXTIL",
-    "colorHex": "#808080",
+    "colorHex": "#AF52DE",
     "hint": "Čisté a suché oblečení, spárovaná obuv, bytový textil (závěsy, povlečení), kabelky a plyšové hračky. Vše zabalené v igelitovém pytli.",
     "warning": "Nepatří sem: Mokrý nebo znečištěný textil, koberce, matrace, molitan, kůže a kožichy, průmyslové odstřižky látek.",
     "education": "Textil putuje do charity Baltazar nebo k průmyslovému zpracování (výroba izolací a čisticích hadrů)."
@@ -39,7 +39,7 @@
     "id": "bioodpad",
     "title": "Bioodpad",
     "titleShortUpper": "BIOODPAD",
-    "colorHex": "#8B4513",
+    "colorHex": "#C47F2B",
     "hint": "Zbytky ovoce a zeleniny, kávová sedlina, čajové sáčky, uvadlé květiny, tráva, listí, drobné větve, piliny.",
     "warning": "Nepatří sem: Zbytky jídel živočišného původu (maso, kosti), mléčné výrobky, oleje, exkrementy masožravých zvířat, pleny.",
     "education": "Bioodpad se v brněnské kompostárně mění v kvalitní substrát s certifikátem 'Brněnský kompost', který vrací živiny do půdy."

@@ -51,15 +51,10 @@ enum WasteFilter: String, CaseIterable, Identifiable {
 
     // MARK: - UI Properties
 
-    /// Color used for filter chips, map pins, and category badges.
+    /// Color for filter chips, map pins, and badges.
+    /// Single source of truth — delegates to WasteKind.color (from WasteKindData.json).
     var color: Color {
-        switch self {
-        case .papir:  return .blue
-        case .plast:  return .yellow
-        case .bio:    return .brown
-        case .sklo:   return .green
-        case .textil: return .purple
-        }
+        wasteKind.color
     }
 
     /// SF Symbol name for the waste type icon.
