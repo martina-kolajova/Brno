@@ -114,8 +114,10 @@ final class BrnoMapViewModel: ObservableObject {
         // Subscribe to the region subject with a 100ms debounce.
         // This means we only re-filter stations 100ms after the user
         // *stops* scrolling/zooming, avoiding unnecessary work mid-gesture.
+        // Uses RunLoop.main scheduler — compatible with @MainActor isolation
+        // (DispatchQueue.main can cause "publishing from background thread" warnings).
         regionSubject
-            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(100), scheduler: RunLoop.main)
             .sink { [weak self] in self?.recomputeVisibleStations() }
             .store(in: &cancellables)
     }
