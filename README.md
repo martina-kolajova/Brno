@@ -31,8 +31,6 @@ No third-party dependencies — only Apple frameworks (SwiftUI, MapKit, CoreLoca
 
 ---
 
----
-
 ## Getting Started
 ```bash
 git clone https://github.com/martina-kolajova/Brno.git
@@ -50,7 +48,6 @@ No API keys or config files needed. Data is fetched from the public Brno open-da
 
 MVVM with a clear separation between data, logic, and UI.
 
-
 **Notable implementation details:**
 - Stations are filtered off the main thread via `Task.detached`, debounced at 100 ms, capped at 200 visible pins
 - All API pages are fetched concurrently with `withThrowingTaskGroup` and merged in a single pass
@@ -60,7 +57,12 @@ MVVM with a clear separation between data, logic, and UI.
 
 ## Data Source
 
-Container locations come from the City of Brno ArcGIS open-data service. The API is queried with paginated GeoJSON requests (1 000 features per page). Stations are grouped by `stanoviste_ogc_fid` so multiple container types at the same physical location appear as a single map pin.
+Container locations are fetched from the City of Brno ArcGIS open-data service:
+```
+https://services6.arcgis.com/fUWVlHWZNxUvTUh8/arcgis/rest/services/kontejnery_separovany/FeatureServer/0/query
+```
+
+The API is queried with paginated GeoJSON requests (1 000 features per page). Stations are grouped by `stanoviste_ogc_fid` so multiple container types at the same physical location appear as a single pin.
 
 ---
 
