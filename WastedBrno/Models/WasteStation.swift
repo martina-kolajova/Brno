@@ -2,15 +2,25 @@ import Foundation
 import CoreLocation
 
 // MARK: - Container Station Model
+// Represents a single waste collection station in Brno.
+// Each station has a unique ID, a name, a list of waste types (komodity),
+// and GPS coordinates for placing pins on the map.
+// One station can have multiple containers (e.g. paper + glass at the same spot).
 
 struct WasteStation: Identifiable {
+    /// Unique station ID from the API (stanoviste_ogc_fid).
     let id: String
+    /// Human-readable name of the station (e.g. street name or location description).
     let nazev: String
+    /// List of waste types accepted at this station (e.g. ["Papír", "Sklo barevné"]).
     let komodity: [String]
+    /// GPS coordinates used to place the pin on the map.
     let coordinate: CLLocationCoordinate2D
 }
 
 // MARK: - Filter Matching
+// These methods let us quickly check which waste types a station accepts.
+// Used by the map to decide which pins to show based on active filters.
 
 extension WasteStation {
     /// Returns true if the station has containers matching the given filter.

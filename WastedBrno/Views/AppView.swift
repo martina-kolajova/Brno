@@ -77,24 +77,19 @@ struct AppView: View {
                     // Tab 1: Info screen — shows waste statistics and charts.
                     // "Continue" advances to the map.
                     InfoView(stats: vm.stats, onContinue: {
-                        withAnimation { vm.selectedTab = 2 }
+                        withAnimation(.easeInOut(duration: 0.6)) { vm.selectedTab = 2 }
                     })
                     .tag(1)
 
                     // Tab 2: Map screen — interactive map with all waste stations.
-                    // Wrapped in a Group so the heavy Map view is only created
-                    // when the user actually navigates to this tab (lazy loading).
-                    Group {
-                        if vm.selectedTab == 2 {
-                            BrnoView(allStations: vm.allStations, onBack: {
-                                withAnimation(.easeInOut(duration: 0.4)) {
-                                    vm.selectedTab = 1
-                                }
-                            })
-                        } else {
-                            Color.clear   // lightweight placeholder while on other tabs
+                    // BrnoView is always kept alive (not lazy) so MapKit initialises
+                    // in the background while the user reads the InfoView.
+                    // This prevents the stutter caused by MapKit loading mid-transition.
+                    BrnoView(allStations: vm.allStations, onBack: {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            vm.selectedTab = 1
                         }
-                    }
+                    })
                     .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))  // swipe between tabs, no dots

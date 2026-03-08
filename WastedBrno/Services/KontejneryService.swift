@@ -20,12 +20,19 @@ final class KontejneryService: KontejneryServicing {
     private let logger = Logger(subsystem: "com.WastedBrno", category: "KontejneryService")
 
     /// URLSession with a 15s timeout so requests don't hang forever.
-    private let session: URLSession = {
-        let config = URLSessionConfiguration.default
-        config.timeoutIntervalForRequest = 15
-        config.timeoutIntervalForResource = 60
-        return URLSession(configuration: config)
-    }()
+    /// A custom session can be injected for testing (e.g. using MockURLProtocol).
+    private let session: URLSession
+
+    init(session: URLSession? = nil) {
+        if let session {
+            self.session = session
+        } else {
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = 15
+            config.timeoutIntervalForResource = 60
+            self.session = URLSession(configuration: config)
+        }
+    }
 
     /// Fetches ALL container data using paginated requests, then computes stats + grouped stations.
     func fetchAllData() async throws -> (stats: WasteStatistics, stations: [WasteStation]) {

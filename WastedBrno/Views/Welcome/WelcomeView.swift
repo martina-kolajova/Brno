@@ -7,18 +7,26 @@
 
 import SwiftUI
 
-
 // MARK: - Welcome View
+// The first screen the user sees (Tab 0) — an animated splash/onboarding.
+// Animation sequence:
+//   1. Trash can stands upright (1.1s pause)
+//   2. Trash can tips 90° to the left and turns red (0.45s)
+//   3. Lid opens with a spring bounce (0.35s)
+//   4. Everything slides off-screen to the left (3s)
+//   5. Automatically advances to InfoView (Tab 1)
+// No user interaction needed — it plays automatically on launch.
 
 struct WelcomeView: View {
+    /// Called when the animation finishes — AppView advances to Tab 1 (InfoView).
     var onFinished: () -> Void
 
-    // Animation states
-    @State private var tipped = false      // trash tips 90° left
-    @State private var lidOpen = false      // lid opens after tipping
-    @State private var exitOffset: CGFloat = 0
+    // Animation states — each controls one phase of the sequence
+    @State private var tipped = false        // trash can has fallen 90° to the left
+    @State private var lidOpen = false       // lid is open after the can tipped
+    @State private var exitOffset: CGFloat = 0  // slides everything off-screen
 
-    /// Current colour — black at start, red after tipping
+    /// Accent color changes from black → red when the can tips over.
     private var accentColor: Color { tipped ? .red : .black }
 
     var body: some View {
@@ -27,32 +35,35 @@ struct WelcomeView: View {
 
             VStack(spacing: 3) {
 
-                // Trash can — tips 90° to the left, pivoting from its bottom-left corner
+                // --- Trash can ---
+                // Tips 90° left, pivoting from its bottom-left corner.
+                // Lid opens after tipping with a spring bounce.
                 TrashCanView(
                     lidAngle: lidOpen ? -60 : 0,
                     color: accentColor
                 )
-                .scaleEffect(0.92) // Slightly smaller than the final size for a subtle "pop" when it falls
+                .scaleEffect(0.92)
                 .rotationEffect(
                     .degrees(tipped ? -90 : 0),
-                    anchor: .bottomLeading
+                    anchor: .bottomLeading  // pivot point = bottom-left corner
                 )
-                .offset(x: 60)
+                .offset(x: 70)
 
-                // App title
+                // --- App title ---
                 HStack(spacing: 3) {
                     Text("Wasted")
                         .font(.system(size: 44, weight: .medium))
-                        .foregroundStyle(accentColor)
+                        .foregroundStyle(accentColor)  // black → red when can tips
 
                     Text("Brno")
                         .font(.system(size: 44, weight: .medium))
                         .foregroundStyle(.black)
                 }
             }
-            .offset(x: exitOffset)
+            .offset(x: exitOffset)  // slides entire VStack off-screen
         }
         .onAppear {
+            // --- Animation timeline ---
             // Small initial pause so the screen isn't instant
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
 
@@ -73,7 +84,7 @@ struct WelcomeView: View {
                             exitOffset = -1000
                         }
 
-                        // Transition to next screen
+                        // Phase D: Transition to InfoView (Tab 1)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                             onFinished()
                         }
@@ -97,7 +108,7 @@ struct WelcomeView: View {
             TrashCanView(lidAngle: -60, color: .red)
                 .scaleEffect(0.92)
                 .rotationEffect(.degrees(-90), anchor: .bottomLeading)
-                .offset(x: 60)
+                .offset(x: 70)
             HStack(spacing: 3) {
                 Text("Wasted")
                     .font(.system(size: 44, weight: .medium))

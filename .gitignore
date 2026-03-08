@@ -48,6 +48,26 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# Xcode user data (personal preferences, breakpoints, window state)
+*.xcuserdata/
+**/*.xcuserstate
+**/xcuserdata/
+
+# macOS noise
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Secrets — NEVER commit API keys, certificates, or provisioning profiles
+*.pem
+*.p12
+*.mobileprovision
+Secrets.swift
+Secrets.plist
+GoogleService-Info.plist
+Config.xcconfig
+
 # Environment & secrets
 *.env
 *.pem

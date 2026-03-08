@@ -8,26 +8,38 @@
 import SwiftUI
 import CoreLocation
 
+// MARK: - Detail Station Panel
+// The bottom sheet that appears when the user taps a station pin on the map.
+// Shows: station name, location, walking distance/time, waste type icons, and a "Navigate" button.
+// Uses SwiftUI's presentationDetents — collapsed (70pt) or expanded.
+// Used by: BrnoView → .sheet(item: $vm.selectedStation)
+
 struct DetailStationPanel: View {
+    /// The station the user tapped on.
     let station: WasteStation
+    /// Walking info string (e.g. "350 m • 5 min") — nil if no route calculated yet.
     let navInfo: String?
+    /// Called when the user taps the "Navigovat ke košu" button.
     var onNavigate: () -> Void
+    /// Controls the sheet height — .height(70) = collapsed, .medium/.large = expanded.
     @Binding var detent: PresentationDetent
 
+    /// True when the sheet is in its smallest (collapsed) state.
     private var isCollapsed: Bool { detent == .height(70) }
 
     var body: some View {
         Group {
             if isCollapsed {
-                Color.clear
+                Color.clear  // collapsed → show nothing (just the drag handle)
             } else {
-                content
+                content      // expanded → show full station detail
             }
         }
         .background(Color.white)
     }
 
     // MARK: - Content
+    // The full expanded view with header, waste icons, and navigate button.
 
     private var content: some View {
         ScrollView {
@@ -52,6 +64,7 @@ struct DetailStationPanel: View {
     }
 
     // MARK: - Header
+    // Shows station name, "Brno, Česká republika" subtitle, and walking info badge.
 
     private var header: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -79,6 +92,8 @@ struct DetailStationPanel: View {
     }
 
     // MARK: - Commodity Icons (deduplicated)
+    // Horizontal row of coloured circles showing which waste types the station accepts.
+    // Uses matchingFilters to prevent duplicates (e.g. two "Sklo" entries → one icon).
 
     private var commodityRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -97,6 +112,7 @@ struct DetailStationPanel: View {
     }
 
     // MARK: - Navigate Button
+    // Red full-width button at the bottom — calculates a walking route to this station.
 
     private var bottomCTA: some View {
         Button(action: onNavigate) {
