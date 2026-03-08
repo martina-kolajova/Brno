@@ -62,11 +62,15 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
 
     /// Called when the user grants or denies location permission.
     /// We only start GPS updates after permission is granted.
+    /// Dispatched to main thread — CLLocationManager must be started
+    /// from the same thread it was created on (main thread).
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             logger.info("📍 Location authorized — starting updates")
-            manager.startUpdatingLocation()
+            DispatchQueue.main.async {
+                manager.startUpdatingLocation()
+            }
         case .denied, .restricted:
             logger.warning("⚠️ Location access denied")
         case .notDetermined:
@@ -84,33 +88,43 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
     /// Called every time a new GPS coordinate arrives from the device.
     /// Updates lastLocation, checks if user is in Brno, and reverse-geocodes the street name.
     /// Geocoding is rate-limited to once every 10 seconds to respect Apple's rate limits.
+    /// All @Published updates are dispatched to main thread — CoreLocation delegates
+    /// can fire on ANY thread, but SwiftUI requires main thread for @Published writes.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        lastLocation = location
 
         let brnoCenter = CLLocation(latitude: Self.defaultBrnoCoordinate.latitude,
                                     longitude: Self.defaultBrnoCoordinate.longitude)
-        isInBrno = location.distance(from: brnoCenter) <= Self.brnoRadius
+        let inBrno = location.distance(from: brnoCenter) <= Self.brnoRadius
 
-        guard isInBrno else {
-            currentStreetName = ""  // clear stale street name when leaving Brno
-            return
+        // Dispatch @Published writes to main thread — prevents
+        // "Publishing changes from background threads" warning
+        DispatchQueue.main.async {
+            self.lastLocation = location
+            self.isInBrno = inBrno
+            if !inBrno {
+                self.currentStreetName = ""
+            }
         }
+
+        guard inBrno else { return }
 
         // Rate-limit geocoding — Apple silently drops requests if called too often
         let now = Date()
         guard now.timeIntervalSince(lastGeocodeTime) >= geocodeInterval else { return }
         lastGeocodeTime = now
 
-        // Use async/await geocoder — ensures @Published updates happen on @MainActor
+        // Geocode street name — result dispatched to main thread via DispatchQueue
         Task {
             do {
                 let placemarks = try await CLGeocoder().reverseGeocodeLocation(location)
                 if let street = placemarks.first?.thoroughfare {
-                    currentStreetName = street
+                    DispatchQueue.main.async {
+                        self.currentStreetName = street
+                    }
                 }
             } catch {
-                logger.error("❌ Reverse geocoding failed: \(error.localizedDescription)")
+                self.logger.error("❌ Reverse geocoding failed: \(error.localizedDescription)")
             }
         }
     }
