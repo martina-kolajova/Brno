@@ -349,7 +349,7 @@ final class KontejneryServiceTests: XCTestCase {
     // MARK: - Zero containers edge case
 
     func testFetchAllData_zeroContainers_returnsEmptyResult() async throws {
-        // API reports 0 containers — service should return empty without making page requests
+        // API reports 0 containers — service should throw emptyResponse error
         var pageRequested = false
         MockURLProtocol.requestHandler = { [self] request in
             let url = request.url!.absoluteString
@@ -360,10 +360,17 @@ final class KontejneryServiceTests: XCTestCase {
             return (makeGeoJSON(), ok(for: url))
         }
 
-        let result = try await sut.fetchAllData()
+        do {
+            _ = try await sut.fetchAllData()
+            XCTFail("Expected emptyResponse error but fetchAllData succeeded")
+        } catch let error as ServiceError {
+            if case .emptyResponse = error {
+                // expected
+            } else {
+                XCTFail("Expected .emptyResponse but got \(error)")
+            }
+        }
 
-        XCTAssertEqual(result.stats.totalContainers, 0)
-        XCTAssertTrue(result.stations.isEmpty)
         XCTAssertFalse(pageRequested, "No page requests should be made when count is 0")
     }
 

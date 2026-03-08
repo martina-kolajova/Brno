@@ -31,18 +31,31 @@ final class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterD
 
     /// Called by the search bar every time the user types a character.
     /// Passes the partial text to Apple Maps for autocomplete.
+    /// Clears results when query is empty to avoid showing stale suggestions.
     func update(query: String) {
+        guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
+            results = []
+            return
+        }
         completer.queryFragment = query
     }
 
     /// Delegate callback — Apple Maps returned new suggestions.
     /// We filter to only keep results that contain "Brno" in the subtitle.
+    /// If Apple returns results but none are in Brno, we log a warning
+    /// (otherwise this silently shows an empty dropdown with no explanation).
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        results = completer.results.filter { $0.subtitle.contains("Brno") }
+        let brnoResults = completer.results.filter { $0.subtitle.contains("Brno") }
+        if !completer.results.isEmpty && brnoResults.isEmpty {
+            logger.info("🔍 \(completer.results.count) results found but none in Brno — filtered to 0")
+        }
+        results = brnoResults
     }
 
     /// Delegate callback — the search failed (e.g. no network).
+    /// Clears any stale results so the dropdown doesn't show outdated suggestions.
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         logger.error("❌ Search autocomplete failed: \(error.localizedDescription)")
+        results = []
     }
 }

@@ -76,8 +76,14 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         }
     }
 
+    /// Minimum interval between reverse geocoding requests (seconds).
+    /// Apple rate-limits CLGeocoder — calling it on every GPS update causes silent failures.
+    private var lastGeocodeTime: Date = .distantPast
+    private let geocodeInterval: TimeInterval = 10
+
     /// Called every time a new GPS coordinate arrives from the device.
     /// Updates lastLocation, checks if user is in Brno, and reverse-geocodes the street name.
+    /// Geocoding is rate-limited to once every 10 seconds to respect Apple's rate limits.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         lastLocation = location
@@ -86,15 +92,25 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
                                     longitude: Self.defaultBrnoCoordinate.longitude)
         isInBrno = location.distance(from: brnoCenter) <= Self.brnoRadius
 
-        guard isInBrno else { return }
+        guard isInBrno else {
+            currentStreetName = ""  // clear stale street name when leaving Brno
+            return
+        }
 
-        CLGeocoder().reverseGeocodeLocation(location) { [weak self] placemarks, error in
-            if let error {
-                self?.logger.error("❌ Reverse geocoding failed: \(error.localizedDescription)")
-                return
-            }
-            if let street = placemarks?.first?.thoroughfare {
-                DispatchQueue.main.async { self?.currentStreetName = street }
+        // Rate-limit geocoding — Apple silently drops requests if called too often
+        let now = Date()
+        guard now.timeIntervalSince(lastGeocodeTime) >= geocodeInterval else { return }
+        lastGeocodeTime = now
+
+        // Use async/await geocoder — ensures @Published updates happen on @MainActor
+        Task {
+            do {
+                let placemarks = try await CLGeocoder().reverseGeocodeLocation(location)
+                if let street = placemarks.first?.thoroughfare {
+                    currentStreetName = street
+                }
+            } catch {
+                logger.error("❌ Reverse geocoding failed: \(error.localizedDescription)")
             }
         }
     }

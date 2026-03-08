@@ -65,10 +65,10 @@ final class KontejneryService: KontejneryServicing {
         let total = try await fetchTotalCount()
         logger.info("📦 Total containers from API: \(total)")
 
-        // Edge case: API returned 0 containers — return empty result immediately
+        // Edge case: API returned 0 containers — something is wrong with the API
         guard total > 0 else {
             logger.warning("⚠️ API returned 0 containers")
-            return (WasteStatistics(totalContainers: 0, totalStations: 0, byKind: [:]), [])
+            throw ServiceError.emptyResponse
         }
 
         // Step 2: Calculate number of pages and fetch them all concurrently
@@ -259,11 +259,14 @@ private extension KontejneryService {
 
 enum ServiceError: LocalizedError {
     case httpError(statusCode: Int)
+    case emptyResponse
 
     var errorDescription: String? {
         switch self {
         case .httpError(let code):
             return "Server responded with status code \(code)"
+        case .emptyResponse:
+            return "The server returned no waste container data. Please try again later."
         }
     }
 }
