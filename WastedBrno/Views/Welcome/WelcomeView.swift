@@ -80,12 +80,15 @@ struct WelcomeView: View {
 
                     // Phase C: Slide everything off screen to the left
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        withAnimation(.easeInOut(duration: 3)) {
-                            exitOffset = -1000
+                        withAnimation(.easeIn(duration: 0.5)) {
+                            exitOffset = -600
                         }
 
                         // Phase D: Transition to InfoView (Tab 1)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        // Wait for the exit slide to finish BEFORE switching tabs
+                        // — prevents two animations fighting each other (the old 3s slide
+                        //   was still running when the TabView swipe started at 0.6s).
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             onFinished()
                         }
                     }

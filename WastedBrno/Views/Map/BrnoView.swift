@@ -15,6 +15,10 @@ struct BrnoView: View {
     /// Callback to navigate back to the Info screen.
     var onBack: (() -> Void)? = nil
 
+    /// The currently selected tab index — used to trigger location permission
+    /// only when the map tab (2) actually becomes visible.
+    let selectedTab: Int
+
     // MARK: - State objects
     // Each @StateObject is created once and survives view re-renders.
 
@@ -72,7 +76,9 @@ struct BrnoView: View {
         }
         .animation(.spring(response: 0.35), value: vm.showNavigationPanel)
         // Pass all stations to the view-model once when this screen appears.
-        .onAppear { vm.setAllStations(allStations) }
+        .onAppear {
+            vm.setAllStations(allStations)
+        }
         // Keep the search completer in sync with the text field.
         .onChange(of: streetQuery) { _, newValue in
             if isSearchFocused { searchCompleter.update(query: newValue) }
@@ -98,6 +104,14 @@ struct BrnoView: View {
         .onDisappear {
             dashTimer?.invalidate()
             dashTimer = nil
+        }
+        // Request location permission only when the map tab actually becomes visible.
+        // Using .onChange instead of .onAppear because BrnoView is always alive in the TabView
+        // — .onAppear fires immediately when the TabView is created, even on Tab 1.
+        .onChange(of: selectedTab) { _, newTab in
+            if newTab == 2 {
+                locationManager.requestPermissionIfNeeded()
+            }
         }
     }
 
@@ -154,8 +168,24 @@ struct BrnoView: View {
                     )
             }
 
-            // --- User's live GPS dot ---
-            UserAnnotation()
+            // --- User's live GPS location ---
+            // Replaces the default blue dot with a custom "Tady su" red pin.
+            // Only shown when we have a real GPS fix and the user is in Brno.
+            if let userCoord = locationManager.lastLocation?.coordinate, locationManager.isInBrno {
+                Annotation("Tady su", coordinate: userCoord) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 14, height: 14)
+                        Circle()
+                            .strokeBorder(Color.white, lineWidth: 2.5)
+                            .frame(width: 14, height: 14)
+                        Circle()
+                            .fill(Color.red.opacity(0.2))
+                            .frame(width: 30, height: 30)
+                    }
+                }
+            }
         }
         .mapStyle(.standard)
         // Every time the user scrolls/zooms, update the view-model's region.
