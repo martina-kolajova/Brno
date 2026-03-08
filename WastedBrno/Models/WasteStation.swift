@@ -7,7 +7,7 @@ import CoreLocation
 // and GPS coordinates for placing pins on the map.
 // One station can have multiple containers (e.g. paper + glass at the same spot).
 
-struct WasteStation: Identifiable {
+struct WasteStation: Identifiable, Equatable {
     /// Unique station ID from the API (stanoviste_ogc_fid).
     let id: String
     /// Human-readable name of the station (e.g. street name or location description).
@@ -16,6 +16,12 @@ struct WasteStation: Identifiable {
     let komodity: [String]
     /// GPS coordinates used to place the pin on the map.
     let coordinate: CLLocationCoordinate2D
+
+    /// Manual Equatable — CLLocationCoordinate2D doesn't conform automatically.
+    /// Lets SwiftUI skip re-rendering pins that haven't changed.
+    static func == (lhs: WasteStation, rhs: WasteStation) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 // MARK: - Filter Matching

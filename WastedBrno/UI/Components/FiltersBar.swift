@@ -101,12 +101,13 @@ struct FiltersBar: View {
                             filter: filter,
                             isSelected: selected.contains(filter),
                             action: {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                                    if selected.contains(filter) {
-                                        selected.remove(filter)
-                                    } else {
-                                        selected.insert(filter)
-                                    }
+                                // No withAnimation here — animating 200 pin changes
+                                // at once causes visible lag. The chip itself animates
+                                // via its own internal animation.
+                                if selected.contains(filter) {
+                                    selected.remove(filter)
+                                } else {
+                                    selected.insert(filter)
                                 }
                             }
                         )
