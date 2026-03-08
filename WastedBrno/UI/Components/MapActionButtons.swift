@@ -101,12 +101,11 @@ struct MapActionButtons: View {
 
     private var locationButton: some View {
         Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                vm.isTracking.toggle()
-            }
+            // Clear any street search — go back to GPS / default location
             vm.clearSearchPoint()
             onClearSearch()
 
+            // Move camera to user's location (or Brno centre if not in Brno)
             let coord = isInBrno
                 ? effectiveLocation.coordinate
                 : LocationManager.defaultBrnoCoordinate
@@ -117,16 +116,16 @@ struct MapActionButtons: View {
                 ))
             }
         } label: {
+            // Arrow button — always red background, white icon. No toggle.
             Image(systemName: "location.fill")
-                .foregroundStyle(vm.isTracking ? .red : .white)
+                .foregroundStyle(.white)
                 .font(.system(size: 18, weight: .semibold))
                 .frame(width: 50, height: 50)
                 .background(
                     Circle()
-                        .fill(vm.isTracking ? .white : .red)
+                        .fill(.red)
                         .shadow(color: .black.opacity(0.15), radius: 4)
                 )
         }
-        .scaleEffect(vm.isTracking ? 0.95 : 1.0)
     }
 }

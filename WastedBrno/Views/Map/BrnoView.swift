@@ -57,6 +57,15 @@ struct BrnoView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             mapLayer
+
+            // Transparent overlay — dismisses search when tapping outside the search bar.
+            // Only appears when suggestions are showing. Doesn't block map when search is inactive.
+            if isSearchFocused {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture { isSearchFocused = false }
+            }
+
             controlsLayer
 
             // Floating action buttons (bottom-right): locate user, reset camera, open quick-nav panel.
@@ -85,7 +94,8 @@ struct BrnoView: View {
             if newValue.isEmpty { vm.clearSearchPoint() }
         }
         // Re-filter pins whenever the user toggles a filter chip.
-        .onChange(of: vm.selectedFilters) { vm.triggerRecompute() }
+        // Uses didSet → triggerRecompute via the debounced pipeline.
+        .onChange(of: vm.selectedFilters) { _, _ in vm.triggerRecompute() }
         // Move camera to user's real GPS location once (if they're in Brno).
         // If outside Brno or location denied, the default Brno centre stays.
         .onChange(of: locationManager.lastLocation) { _, newLocation in
@@ -140,15 +150,23 @@ struct BrnoView: View {
                 }
             }
 
-            // --- Search-point marker ---
-            // Shown when the user searched for an address (red pin).
+            // --- Location pins ---
+            // Two visually different pins:
+            //   "Tady su"    = GPS red dot — user's real location (or Brno centre if outside Brno)
+            //   "Tady nejsu" = red mappin — user searched for a street (funny: "I'm not here")
+            // Only one is ever shown. Search pin takes priority.
+
+            // GPS dot — shown only when NO street is searched
+            if vm.activeSearchPoint == nil {
+                Annotation("Tady su", coordinate: locationManager.effectiveLocation.coordinate) {
+                    gpsPin
+                }
+            }
+
+            // Search mappin — shown only when a street IS searched
             if let searchPoint = vm.activeSearchPoint {
-                Annotation("Tady su", coordinate: searchPoint) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(.red)
-                        .background(Circle().fill(.white))
-                        .shadow(radius: 3)
+                Annotation("Tady nejsu", coordinate: searchPoint) {
+                    searchPin
                 }
             }
 
@@ -166,25 +184,6 @@ struct BrnoView: View {
                             dashPhase: dashPhase
                         )
                     )
-            }
-
-            // --- User's live GPS location ---
-            // Replaces the default blue dot with a custom "Tady su" red pin.
-            // Only shown when we have a real GPS fix and the user is in Brno.
-            if let userCoord = locationManager.lastLocation?.coordinate, locationManager.isInBrno {
-                Annotation("Tady su", coordinate: userCoord) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 14, height: 14)
-                        Circle()
-                            .strokeBorder(Color.white, lineWidth: 2.5)
-                            .frame(width: 14, height: 14)
-                        Circle()
-                            .fill(Color.red.opacity(0.2))
-                            .frame(width: 30, height: 30)
-                    }
-                }
             }
         }
         .mapStyle(.standard)
@@ -249,5 +248,33 @@ struct BrnoView: View {
 
             Spacer()
         }
+    }
+
+    // MARK: - Pin appearances
+    // Two visually distinct pins so the user can tell them apart at a glance.
+
+    /// "Tady su" — red pulsing dot for the user's real GPS location.
+    /// Looks like a standard "you are here" indicator.
+    private var gpsPin: some View {
+        ZStack {
+            Circle()
+                .fill(Color.red.opacity(0.15))
+                .frame(width: 32, height: 32)
+            Circle()
+                .fill(Color.red)
+                .frame(width: 14, height: 14)
+            Circle()
+                .strokeBorder(Color.white, lineWidth: 2.5)
+                .frame(width: 14, height: 14)
+        }
+    }
+
+    /// "Tady nejsu" — red map pin for a searched street address.
+    /// Visually different from the GPS dot so the user knows this is a manual selection.
+    private var searchPin: some View {
+        Image(systemName: "mappin.and.ellipse")
+            .font(.system(size: 36, weight: .bold))
+            .foregroundStyle(.red)
+            .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
     }
 }

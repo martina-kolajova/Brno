@@ -63,11 +63,6 @@ final class BrnoMapViewModel: ObservableObject {
     /// Controls the drag position (height) of the detail bottom sheet.
     @Published var detent: PresentationDetent = .height(70)
 
-    // MARK: - User tracking
-    // Whether the map is following the user's live location.
-
-    @Published var isTracking: Bool = false
-
     // MARK: - Search & filters
     // Controls which waste types are shown and optional address-based search.
 
@@ -153,20 +148,30 @@ final class BrnoMapViewModel: ObservableObject {
     }
 
     // MARK: - Background filtering
-    // This is the performance-critical part: filtering potentially 1000+ stations
-    // is done on a background thread so the UI stays responsive.
+    // Performance-critical: filters 1000+ stations on a background thread.
+    //
+    // Algorithm (easy to explain in interview):
+    //   1. Cancel any previous filter task (user may still be scrolling)
+    //   2. Single pass through all stations:
+    //      - Is it inside the visible map rectangle? (bounding box check)
+    //      - Does it match at least one active filter? (contains check)
+    //   3. Stop at 200 pins (early break — never processes more than needed)
+    //   4. Write result back to main thread → SwiftUI updates the map
+    //
+    // Why this is fast:
+    //   - O(n) single pass, no sorting, no grouping, no dictionaries
+    //   - Early exit at cap — best case processes only 200 stations
+    //   - Debounced by 100ms — doesn't fire during mid-scroll
+    //   - Background thread — UI stays at 60fps during filtering
 
     private func recomputeVisibleStations() {
-        // Cancel any in-flight filter task (user scrolled again).
         filterTask?.cancel()
 
-        // Snapshot current state into local constants — safe to use off-main-thread.
         let filters = effectiveFilters
         let region = mapRegion
         let stations = allStationsCache
         let cap = maxAnnotations
 
-        // No filters active → show no pins (user must pick at least one waste type).
         guard !filters.isEmpty else {
             visibleStations = []
             isRecomputing = false
@@ -175,33 +180,31 @@ final class BrnoMapViewModel: ObservableObject {
 
         isRecomputing = true
 
-        // Run the heavy filtering work on a background thread.
         filterTask = Task.detached(priority: .userInitiated) { [weak self] in
 
-            // 1. Bounding box — only keep stations that fall within the visible map area.
+            // Bounding box of the visible map area
             let minLat = region.center.latitude - region.span.latitudeDelta / 2
             let maxLat = region.center.latitude + region.span.latitudeDelta / 2
             let minLon = region.center.longitude - region.span.longitudeDelta / 2
             let maxLon = region.center.longitude + region.span.longitudeDelta / 2
 
-            let result = stations.filter { st in
+            // Single pass: check bounds + filter match, stop at 200
+            var result = [WasteStation]()
+            result.reserveCapacity(cap)
+
+            for st in stations {
+                if Task.isCancelled { return }            // stop early if a new filter task started
+                guard result.count < cap else { break }   // early exit at cap
                 let lat = st.coordinate.latitude
                 let lon = st.coordinate.longitude
-                let inBounds = lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon
-                guard inBounds else { return false }
-                // Also check that the station matches at least one active filter.
-                return filters.contains { st.matches($0) }
+                guard lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon else { continue }
+                guard filters.contains(where: { st.matches($0) }) else { continue }
+                result.append(st)
             }
 
-            // 2. Cap to prevent UI overload — take at most `cap` stations.
-            let capped = result.count > cap ? Array(result.prefix(cap)) : result
-
-            // Only check cancellation *after* filtering is done —
-            // avoids partial updates while still allowing fast cancellation.
             guard !Task.isCancelled else { return }
 
-            // 3. Write results back to the main thread.
-            let captured = capped
+            let captured = result
             guard let strongSelf = self else { return }
             await MainActor.run {
                 strongSelf.visibleStations = captured
@@ -237,8 +240,8 @@ final class BrnoMapViewModel: ObservableObject {
         isNavigating = false
         activeNavFilter = nil
         // NOTE: activeSearchPoint is intentionally NOT cleared here
-        // so the "Tady su" pin stays visible after dismissing the detail panel.
-        // It is only cleared by stopNavigation() or selectAddress().
+        // so the "Tady nejsu" search pin stays visible after dismissing the detail panel.
+        // It is only cleared by stopNavigation() or clearSearchPoint().
         triggerRecompute()
     }
 
@@ -259,23 +262,30 @@ final class BrnoMapViewModel: ObservableObject {
     // Lets the user type a street name and jump to that location.
 
     /// Takes a search completion result, geocodes it, and moves the camera there.
+    /// Uses async/await to ensure all @Published property updates happen on @MainActor.
     func selectAddress(_ completion: MKLocalSearchCompletion) {
         // Clear any previous station selection, route, and navigation state
         // so the detail panel from a previous find is dismissed first.
         clearStation()
-        let request = MKLocalSearch.Request(completion: completion)
-        MKLocalSearch(request: request).start { [weak self] response, error in
-            guard let self, let coord = response?.mapItems.first?.placemark.coordinate else {
-                if let error { self?.logger.error("❌ Address geocoding failed: \(error.localizedDescription)") }
-                return
-            }
-            self.logger.info("🔍 Address found: \(coord.latitude), \(coord.longitude)")
-            self.activeSearchPoint = coord
-            withAnimation(.easeInOut(duration: 0.4)) {
-                self.camera = .region(MKCoordinateRegion(
-                    center: coord,
-                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                ))
+
+        Task { @MainActor in
+            let request = MKLocalSearch.Request(completion: completion)
+            do {
+                let response = try await MKLocalSearch(request: request).start()
+                guard let coord = response.mapItems.first?.placemark.coordinate else {
+                    self.logger.warning("⚠️ Geocoding returned no results")
+                    return
+                }
+                logger.info("🔍 Address found: \(coord.latitude), \(coord.longitude)")
+                self.activeSearchPoint = coord
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    self.camera = .region(MKCoordinateRegion(
+                        center: coord,
+                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                    ))
+                }
+            } catch {
+                logger.error("❌ Address geocoding failed: \(error.localizedDescription)")
             }
         }
     }
@@ -297,12 +307,17 @@ final class BrnoMapViewModel: ObservableObject {
             isNavigating = true
             selectStation(nearest)
             showNavigationPanel = false
+        } else {
+            logger.warning("⚠️ No station found matching filter: \(filter.displayName)")
+            showNavigationPanel = false
         }
     }
 
     // MARK: - Route calculation
     // Computes a walking route from the origin to a destination station using Apple Maps directions.
 
+    /// Calculates a walking route from the user's position (or search point) to a station.
+    /// Updates route, routeDistance, routeTravelTime, and zooms the camera to fit the route.
     func calculateRoute(to destination: CLLocationCoordinate2D, userLocation: CLLocation) {
         // Use search point if available, otherwise fall back to GPS.
         let start = activeSearchPoint ?? userLocation.coordinate
@@ -315,7 +330,10 @@ final class BrnoMapViewModel: ObservableObject {
         Task {
             do {
                 let response = try await MKDirections(request: request).calculate()
-                guard let computedRoute = response.routes.first else { return }
+                guard let computedRoute = response.routes.first else {
+                    self.logger.warning("⚠️ No walking route found")
+                    return
+                }
 
                 withAnimation(.easeInOut(duration: 0.4)) {
                     self.route = computedRoute
