@@ -37,7 +37,7 @@ No third-party dependencies — only Apple frameworks (SwiftUI, MapKit, CoreLoca
 ```bash
 git clone https://github.com/martina-kolajova/Brno.git
 cd Brno
-open "Wasted Brno.xcodeproj"
+open "WastedBrno.xcodeproj"
 ```
 
 No API keys or config files needed. Data is fetched from the public Brno open-data endpoint.
@@ -71,7 +71,7 @@ Container locations come from the City of Brno ArcGIS open-data service. The API
 | Paper | `papir` | Blue |
 | Plastic, metals & cartons | `plast` | Yellow |
 | Glass | `sklo` | Green |
-| Textiles | `textil` | Grey |
+| Textiles | `textil` | Purple |
 | Bio-waste | `bioodpad` | Brown |
 
 Recycling hints and educational facts for each category are bundled in `WasteKindData.json`.
