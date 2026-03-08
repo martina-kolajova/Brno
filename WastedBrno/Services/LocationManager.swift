@@ -45,8 +45,17 @@ final class LocationManager: NSObject, ObservableObject, CLLocationManagerDelega
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.requestWhenInUseAuthorization()
-        // Don't start updates here — wait for authorization callback below
+        // Don't request permission here — wait until the map screen appears
+        // so the dialog doesn't interrupt the Welcome/Info animations.
+    }
+
+    /// Requests location permission if the user hasn't been asked yet.
+    /// Called from BrnoView.onAppear — so the dialog only shows when the map is visible
+    /// and the user understands why the app needs their location.
+    func requestPermissionIfNeeded() {
+        if manager.authorizationStatus == .notDetermined {
+            manager.requestWhenInUseAuthorization()
+        }
     }
 
     // MARK: - CLLocationManagerDelegate

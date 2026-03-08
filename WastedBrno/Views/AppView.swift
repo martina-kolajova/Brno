@@ -89,7 +89,7 @@ struct AppView: View {
                         withAnimation(.easeInOut(duration: 0.5)) {
                             vm.selectedTab = 1
                         }
-                    })
+                    }, selectedTab: vm.selectedTab)
                     .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))  // swipe between tabs, no dots
