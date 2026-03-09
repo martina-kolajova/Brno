@@ -6,6 +6,39 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2AACDA1C2F5E6DF100E624E1 /* Brno.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 2AACDA182F5E6DF100E624E1 /* Brno.gpx */; };
+		2AACDA1E2F5E6DF100E624E1 /* WasteKindData.json in Resources */ = {isa = PBXBuildFile; fileRef = 2AACD9F42F5E6DF100E624E1 /* WasteKindData.json */; };
+		2AACDA1F2F5E6DF100E624E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2AACDA172F5E6DF100E624E1 /* Assets.xcassets */; };
+		2AACDA202F5E6DF100E624E1 /* ShapeHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA002F5E6DF100E624E1 /* ShapeHelpers.swift */; };
+		2AACDA212F5E6DF100E624E1 /* StationPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA012F5E6DF100E624E1 /* StationPin.swift */; };
+		2AACDA222F5E6DF100E624E1 /* WasteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA0D2F5E6DF100E624E1 /* WasteDetailView.swift */; };
+		2AACDA232F5E6DF100E624E1 /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA152F5E6DF100E624E1 /* AppView.swift */; };
+		2AACDA242F5E6DF100E624E1 /* SwipeIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA052F5E6DF100E624E1 /* SwipeIndicator.swift */; };
+		2AACDA252F5E6DF100E624E1 /* BrnoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA102F5E6DF100E624E1 /* BrnoView.swift */; };
+		2AACDA262F5E6DF100E624E1 /* MapActionButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9FE2F5E6DF100E624E1 /* MapActionButtons.swift */; };
+		2AACDA272F5E6DF100E624E1 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9FC2F5E6DF100E624E1 /* ButtonStyles.swift */; };
+		2AACDA282F5E6DF100E624E1 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F92F5E6DF100E624E1 /* LocationManager.swift */; };
+		2AACDA292F5E6DF100E624E1 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA082F5E6DF100E624E1 /* AppViewModel.swift */; };
+		2AACDA2A2F5E6DF100E624E1 /* WasteStatsChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA0E2F5E6DF100E624E1 /* WasteStatsChart.swift */; };
+		2AACDA2B2F5E6DF100E624E1 /* WasteStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F52F5E6DF100E624E1 /* WasteStation.swift */; };
+		2AACDA2C2F5E6DF100E624E1 /* InfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA0A2F5E6DF100E624E1 /* InfoViewModel.swift */; };
+		2AACDA2D2F5E6DF100E624E1 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA132F5E6DF100E624E1 /* WelcomeView.swift */; };
+		2AACDA2E2F5E6DF100E624E1 /* BrnoMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA092F5E6DF100E624E1 /* BrnoMapViewModel.swift */; };
+		2AACDA2F2F5E6DF100E624E1 /* DetailStationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA112F5E6DF100E624E1 /* DetailStationPanel.swift */; };
+		2AACDA302F5E6DF100E624E1 /* KontejneryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F82F5E6DF100E624E1 /* KontejneryService.swift */; };
+		2AACDA312F5E6DF100E624E1 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA042F5E6DF100E624E1 /* LoadingView.swift */; };
+		2AACDA322F5E6DF100E624E1 /* FiltersBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9FD2F5E6DF100E624E1 /* FiltersBar.swift */; };
+		2AACDA332F5E6DF100E624E1 /* WasteStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F62F5E6DF100E624E1 /* WasteStatistics.swift */; };
+		2AACDA342F5E6DF100E624E1 /* TrashIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA022F5E6DF100E624E1 /* TrashIcon.swift */; };
+		2AACDA352F5E6DF100E624E1 /* SearchCompleter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9FA2F5E6DF100E624E1 /* SearchCompleter.swift */; };
+		2AACDA362F5E6DF100E624E1 /* QuickNavPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9FF2F5E6DF100E624E1 /* QuickNavPanel.swift */; };
+		2AACDA372F5E6DF100E624E1 /* WastedBrnoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA1A2F5E6DF100E624E1 /* WastedBrnoApp.swift */; };
+		2AACDA382F5E6DF100E624E1 /* WasteFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F22F5E6DF100E624E1 /* WasteFilter.swift */; };
+		2AACDA392F5E6DF100E624E1 /* WasteKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACD9F32F5E6DF100E624E1 /* WasteKind.swift */; };
+		2AACDA3A2F5E6DF100E624E1 /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AACDA0C2F5E6DF100E624E1 /* InfoView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2AA3FAFB2F29A47B00194DE9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,27 +60,40 @@
 		2AA3FAED2F29A47A00194DE9 /* WastedBrno.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WastedBrno.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FAFA2F29A47B00194DE9 /* WastedBrnoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WastedBrnoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA3FB042F29A47B00194DE9 /* WastedBrnoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WastedBrnoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2AACD9F22F5E6DF100E624E1 /* WasteFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteFilter.swift; sourceTree = "<group>"; };
+		2AACD9F32F5E6DF100E624E1 /* WasteKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteKind.swift; sourceTree = "<group>"; };
+		2AACD9F42F5E6DF100E624E1 /* WasteKindData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = WasteKindData.json; sourceTree = "<group>"; };
+		2AACD9F52F5E6DF100E624E1 /* WasteStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteStation.swift; sourceTree = "<group>"; };
+		2AACD9F62F5E6DF100E624E1 /* WasteStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteStatistics.swift; sourceTree = "<group>"; };
+		2AACD9F82F5E6DF100E624E1 /* KontejneryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KontejneryService.swift; sourceTree = "<group>"; };
+		2AACD9F92F5E6DF100E624E1 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		2AACD9FA2F5E6DF100E624E1 /* SearchCompleter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCompleter.swift; sourceTree = "<group>"; };
+		2AACD9FC2F5E6DF100E624E1 /* ButtonStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyles.swift; sourceTree = "<group>"; };
+		2AACD9FD2F5E6DF100E624E1 /* FiltersBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersBar.swift; sourceTree = "<group>"; };
+		2AACD9FE2F5E6DF100E624E1 /* MapActionButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapActionButtons.swift; sourceTree = "<group>"; };
+		2AACD9FF2F5E6DF100E624E1 /* QuickNavPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickNavPanel.swift; sourceTree = "<group>"; };
+		2AACDA002F5E6DF100E624E1 /* ShapeHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeHelpers.swift; sourceTree = "<group>"; };
+		2AACDA012F5E6DF100E624E1 /* StationPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationPin.swift; sourceTree = "<group>"; };
+		2AACDA022F5E6DF100E624E1 /* TrashIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrashIcon.swift; sourceTree = "<group>"; };
+		2AACDA042F5E6DF100E624E1 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		2AACDA052F5E6DF100E624E1 /* SwipeIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeIndicator.swift; sourceTree = "<group>"; };
+		2AACDA082F5E6DF100E624E1 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		2AACDA092F5E6DF100E624E1 /* BrnoMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrnoMapViewModel.swift; sourceTree = "<group>"; };
+		2AACDA0A2F5E6DF100E624E1 /* InfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewModel.swift; sourceTree = "<group>"; };
+		2AACDA0C2F5E6DF100E624E1 /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		2AACDA0D2F5E6DF100E624E1 /* WasteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteDetailView.swift; sourceTree = "<group>"; };
+		2AACDA0E2F5E6DF100E624E1 /* WasteStatsChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasteStatsChart.swift; sourceTree = "<group>"; };
+		2AACDA102F5E6DF100E624E1 /* BrnoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrnoView.swift; sourceTree = "<group>"; };
+		2AACDA112F5E6DF100E624E1 /* DetailStationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailStationPanel.swift; sourceTree = "<group>"; };
+		2AACDA132F5E6DF100E624E1 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		2AACDA152F5E6DF100E624E1 /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
+		2AACDA172F5E6DF100E624E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2AACDA182F5E6DF100E624E1 /* Brno.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brno.gpx; sourceTree = "<group>"; };
+		2AACDA192F5E6DF100E624E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2AACDA1A2F5E6DF100E624E1 /* WastedBrnoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WastedBrnoApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2A1ECC9C2F398D6100A12850 /* Exceptions for "WastedBrno" folder in "WastedBrno" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 2AA3FAEC2F29A47A00194DE9 /* WastedBrno */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		2AA3FAEF2F29A47A00194DE9 /* WastedBrno */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2A1ECC9C2F398D6100A12850 /* Exceptions for "WastedBrno" folder in "WastedBrno" target */,
-			);
-			path = WastedBrno;
-			sourceTree = "<group>";
-		};
 		2AA3FAFD2F29A47B00194DE9 /* WastedBrnoTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = WastedBrnoTests;
@@ -88,7 +134,7 @@
 		2AA3FAE42F29A47A00194DE9 = {
 			isa = PBXGroup;
 			children = (
-				2AA3FAEF2F29A47A00194DE9 /* WastedBrno */,
+				2AACDA1B2F5E6DF100E624E1 /* WastedBrno */,
 				2AA3FAFD2F29A47B00194DE9 /* WastedBrnoTests */,
 				2AA3FB072F29A47B00194DE9 /* WastedBrnoUITests */,
 				2AA3FAEE2F29A47A00194DE9 /* Products */,
@@ -105,6 +151,124 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2AACD9F72F5E6DF100E624E1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2AACD9F22F5E6DF100E624E1 /* WasteFilter.swift */,
+				2AACD9F32F5E6DF100E624E1 /* WasteKind.swift */,
+				2AACD9F42F5E6DF100E624E1 /* WasteKindData.json */,
+				2AACD9F52F5E6DF100E624E1 /* WasteStation.swift */,
+				2AACD9F62F5E6DF100E624E1 /* WasteStatistics.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		2AACD9FB2F5E6DF100E624E1 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				2AACD9F82F5E6DF100E624E1 /* KontejneryService.swift */,
+				2AACD9F92F5E6DF100E624E1 /* LocationManager.swift */,
+				2AACD9FA2F5E6DF100E624E1 /* SearchCompleter.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		2AACDA032F5E6DF100E624E1 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2AACD9FC2F5E6DF100E624E1 /* ButtonStyles.swift */,
+				2AACD9FD2F5E6DF100E624E1 /* FiltersBar.swift */,
+				2AACD9FE2F5E6DF100E624E1 /* MapActionButtons.swift */,
+				2AACD9FF2F5E6DF100E624E1 /* QuickNavPanel.swift */,
+				2AACDA002F5E6DF100E624E1 /* ShapeHelpers.swift */,
+				2AACDA012F5E6DF100E624E1 /* StationPin.swift */,
+				2AACDA022F5E6DF100E624E1 /* TrashIcon.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		2AACDA062F5E6DF100E624E1 /* Transitions */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA042F5E6DF100E624E1 /* LoadingView.swift */,
+				2AACDA052F5E6DF100E624E1 /* SwipeIndicator.swift */,
+			);
+			path = Transitions;
+			sourceTree = "<group>";
+		};
+		2AACDA072F5E6DF100E624E1 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA032F5E6DF100E624E1 /* Components */,
+				2AACDA062F5E6DF100E624E1 /* Transitions */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		2AACDA0B2F5E6DF100E624E1 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA082F5E6DF100E624E1 /* AppViewModel.swift */,
+				2AACDA092F5E6DF100E624E1 /* BrnoMapViewModel.swift */,
+				2AACDA0A2F5E6DF100E624E1 /* InfoViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		2AACDA0F2F5E6DF100E624E1 /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA0C2F5E6DF100E624E1 /* InfoView.swift */,
+				2AACDA0D2F5E6DF100E624E1 /* WasteDetailView.swift */,
+				2AACDA0E2F5E6DF100E624E1 /* WasteStatsChart.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		2AACDA122F5E6DF100E624E1 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA102F5E6DF100E624E1 /* BrnoView.swift */,
+				2AACDA112F5E6DF100E624E1 /* DetailStationPanel.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
+		2AACDA142F5E6DF100E624E1 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA132F5E6DF100E624E1 /* WelcomeView.swift */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+		2AACDA162F5E6DF100E624E1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2AACDA0F2F5E6DF100E624E1 /* Info */,
+				2AACDA122F5E6DF100E624E1 /* Map */,
+				2AACDA142F5E6DF100E624E1 /* Welcome */,
+				2AACDA152F5E6DF100E624E1 /* AppView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2AACDA1B2F5E6DF100E624E1 /* WastedBrno */ = {
+			isa = PBXGroup;
+			children = (
+				2AACD9F72F5E6DF100E624E1 /* Models */,
+				2AACD9FB2F5E6DF100E624E1 /* Services */,
+				2AACDA072F5E6DF100E624E1 /* UI */,
+				2AACDA0B2F5E6DF100E624E1 /* ViewModels */,
+				2AACDA162F5E6DF100E624E1 /* Views */,
+				2AACDA172F5E6DF100E624E1 /* Assets.xcassets */,
+				2AACDA182F5E6DF100E624E1 /* Brno.gpx */,
+				2AACDA192F5E6DF100E624E1 /* Info.plist */,
+				2AACDA1A2F5E6DF100E624E1 /* WastedBrnoApp.swift */,
+			);
+			path = WastedBrno;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -119,9 +283,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				2AA3FAEF2F29A47A00194DE9 /* WastedBrno */,
 			);
 			name = WastedBrno;
 			packageProductDependencies = (
@@ -225,6 +386,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2AACDA1C2F5E6DF100E624E1 /* Brno.gpx in Resources */,
+				2AACDA1E2F5E6DF100E624E1 /* WasteKindData.json in Resources */,
+				2AACDA1F2F5E6DF100E624E1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +413,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2AACDA202F5E6DF100E624E1 /* ShapeHelpers.swift in Sources */,
+				2AACDA212F5E6DF100E624E1 /* StationPin.swift in Sources */,
+				2AACDA222F5E6DF100E624E1 /* WasteDetailView.swift in Sources */,
+				2AACDA232F5E6DF100E624E1 /* AppView.swift in Sources */,
+				2AACDA242F5E6DF100E624E1 /* SwipeIndicator.swift in Sources */,
+				2AACDA252F5E6DF100E624E1 /* BrnoView.swift in Sources */,
+				2AACDA262F5E6DF100E624E1 /* MapActionButtons.swift in Sources */,
+				2AACDA272F5E6DF100E624E1 /* ButtonStyles.swift in Sources */,
+				2AACDA282F5E6DF100E624E1 /* LocationManager.swift in Sources */,
+				2AACDA292F5E6DF100E624E1 /* AppViewModel.swift in Sources */,
+				2AACDA2A2F5E6DF100E624E1 /* WasteStatsChart.swift in Sources */,
+				2AACDA2B2F5E6DF100E624E1 /* WasteStation.swift in Sources */,
+				2AACDA2C2F5E6DF100E624E1 /* InfoViewModel.swift in Sources */,
+				2AACDA2D2F5E6DF100E624E1 /* WelcomeView.swift in Sources */,
+				2AACDA2E2F5E6DF100E624E1 /* BrnoMapViewModel.swift in Sources */,
+				2AACDA2F2F5E6DF100E624E1 /* DetailStationPanel.swift in Sources */,
+				2AACDA302F5E6DF100E624E1 /* KontejneryService.swift in Sources */,
+				2AACDA312F5E6DF100E624E1 /* LoadingView.swift in Sources */,
+				2AACDA322F5E6DF100E624E1 /* FiltersBar.swift in Sources */,
+				2AACDA332F5E6DF100E624E1 /* WasteStatistics.swift in Sources */,
+				2AACDA342F5E6DF100E624E1 /* TrashIcon.swift in Sources */,
+				2AACDA352F5E6DF100E624E1 /* SearchCompleter.swift in Sources */,
+				2AACDA362F5E6DF100E624E1 /* QuickNavPanel.swift in Sources */,
+				2AACDA372F5E6DF100E624E1 /* WastedBrnoApp.swift in Sources */,
+				2AACDA382F5E6DF100E624E1 /* WasteFilter.swift in Sources */,
+				2AACDA392F5E6DF100E624E1 /* WasteKind.swift in Sources */,
+				2AACDA3A2F5E6DF100E624E1 /* InfoView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
