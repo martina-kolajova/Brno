@@ -21,6 +21,8 @@ struct DetailStationPanel: View {
     let navInfo: String?
     /// Called when the user taps the "Navigovat ke košu" button.
     var onNavigate: () -> Void
+    /// Called when the user taps the X button — clears route and dismisses the panel.
+    var onClose: () -> Void
     /// Controls the sheet height — .height(70) = collapsed, .medium/.large = expanded.
     @Binding var detent: PresentationDetent
 
@@ -44,6 +46,18 @@ struct DetailStationPanel: View {
     private var content: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
+                // Close button — dismisses panel and clears route/navigation
+                HStack {
+                    Spacer()
+                    Button {
+                        onClose()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(.gray.opacity(0.5))
+                    }
+                }
+
                 header
                 Divider()
                 commodityRow

@@ -217,6 +217,10 @@ struct BrnoView: View {
                 onNavigate: {
                     vm.calculateRoute(to: station.coordinate, userLocation: locationManager.effectiveLocation)
                 },
+                onClose: {
+                    // Dismiss the panel and clear route/navigation state
+                    vm.clearStation()
+                },
                 detent: $vm.detent
             )
             .presentationDragIndicator(.visible)
@@ -233,7 +237,17 @@ struct BrnoView: View {
     private var controlsLayer: some View {
         VStack(spacing: 0) {
             // Horizontal row of filter chips (Paper, Plastic, Glass…) + search field.
-            FiltersBar(selected: $vm.selectedFilters, streetQuery: $streetQuery, onBack: onBack)
+            // onBack is wrapped to clean up all map state before navigating back.
+            FiltersBar(selected: $vm.selectedFilters, streetQuery: $streetQuery, onBack: {
+                // Dismiss any open panels/sheets before leaving the map
+                vm.selectedStation = nil
+                vm.showNavigationPanel = false
+                vm.stopNavigation()
+                vm.selectedFilters.removeAll()
+                streetQuery = ""
+                isSearchFocused = false
+                onBack?()
+            })
                 .focused($isSearchFocused)
                 .padding(.top, 10)
 
